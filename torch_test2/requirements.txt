@@ -1,0 +1,11 @@
+
+scikit-learn
+pandas
+dill
+rdkit
+numpy
+tqdm
+#ChEMBL_Structure_Pipeline
+#pyg==2.0
+torch-geometric==2.0
+flask
