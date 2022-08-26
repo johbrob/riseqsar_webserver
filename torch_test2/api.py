@@ -28,10 +28,10 @@ def init(dir):
 
 class AvailablePredictors(Resource):
     def get(self):
-        if not 'available_predictors_external_rep' in session:
+        if not available_predictor_references:
             print('Somethihng is not right...')
 
-        return session['available_predictors_external_rep']
+        return available_predictor_references
 
 predict_put_args = reqparse.RequestParser()
 predict_put_args.add_argument('smiles', type=str, help='Molecule in SMILES format', required=True)
