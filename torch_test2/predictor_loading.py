@@ -74,29 +74,23 @@ def get_available_predictors(dir_of_all_predictors):
     # look through all dataset_spect.pkl files in model_dir
     for exp_spec_file in dir_of_all_predictors.rglob('*/experiment_specification.pkl'):
 
-        with open(exp_spec_file, 'rb') as f:  # get endpoint form dataset_spec
-            exp_spec = pickle.load(f)
+        exp_config_file = exp_spec_file.parent / Path('experiment_config.pkl')
+        with open(exp_config_file, 'rb') as f:  # get endpoint form dataset_spec
+            exp_config = pickle.load(f)
+        endpoint = exp_config.dataset_spec_collection.dataset_specs[0].dataset_endpoint
 
-        if exp_spec.experiment_environment == _get_this_python_env():
-            # don't load predictors that use other environments then the current one
+        all_available_models = _get_available_models_of_this_predictor(exp_spec_file.parent.parent)
 
-            exp_config_file = exp_spec_file.parent / Path('experiment_config.pkl')
-            with open(exp_config_file, 'rb') as f:  # get endpoint form dataset_spec
-                exp_config = pickle.load(f)
-            endpoint = exp_config.dataset_spec_collection.dataset_specs[0].dataset_endpoint
+        if all_available_models:
+            predictor_info = _get_predictor_info(all_available_models,
+                                                 exp_spec_file.parent.parent,
+                                                 endpoint,
+                                                 available_predictors)
 
-            all_available_models = _get_available_models_of_this_predictor(exp_spec_file.parent.parent)
-
-            if all_available_models:
-                predictor_info = _get_predictor_info(all_available_models,
-                                                     exp_spec_file.parent.parent,
-                                                     endpoint,
-                                                     available_predictors)
-
-                if endpoint in available_predictors:
-                    available_predictors[endpoint].append(predictor_info)
-                else:
-                    available_predictors[endpoint] = [predictor_info]
+            if endpoint in available_predictors:
+                available_predictors[endpoint].append(predictor_info)
+            else:
+                available_predictors[endpoint] = [predictor_info]
 
     return available_predictors
 
