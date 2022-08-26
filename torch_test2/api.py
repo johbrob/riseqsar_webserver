@@ -58,4 +58,4 @@ api.add_resource(Predict, '/predict')
 if __name__ == "__main__":
     available_predictors, available_predictor_references = init('experiments')
     # app.run(host='0.0.0.0')
-    app.run(debug=True, port=5001)
+    app.run(debug=True, host='0.0.0.0')
