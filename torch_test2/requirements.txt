@@ -10,3 +10,4 @@ flask
 flask-restful
 typing
 optuna
+mordred
