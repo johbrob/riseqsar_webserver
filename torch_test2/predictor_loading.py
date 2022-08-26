@@ -8,35 +8,6 @@ def _get_this_python_env():
     return Path(sys.prefix).name   # I am not sure if one shuld use sys.prefix or sys.base_prefix
 
 
-def _class_to_name(model):
-    from riseqsar.models.logistic_regression import LogisticRegressionPredictor
-    from riseqsar.models.random_forest import RandomForestPredictor
-    from riseqsar.models.svm import SVMClassifier
-    from riseqsar.models.xgboost import XGBoostPredictor
-    from riseqsar.models.neural_networks.feedforward_network import DeepNeuralNetworkDescriptorbasedPredictor
-    from riseqsar.models.neural_networks.graph_neural_network import GraphDeepNeuralNetworkPredictor
-    from riseqsar.models.neural_networks.smiles_transformer import SmilesTransformerPredictor
-    from riseqsar.models.neural_networks.recurrent_networks import RecurrentNetworkPredictor
-    if isinstance(model, LogisticRegressionPredictor):
-        return 'Logistic Regression'
-    elif isinstance(model, RandomForestPredictor):
-        return 'Random Forest'
-    elif isinstance(model, SVMClassifier):
-        return 'Support Vector Machine (SVM)'
-    elif isinstance(model, DeepNeuralNetworkDescriptorbasedPredictor):
-        return 'Deep Neural Network (DNN)'
-    elif isinstance(model, XGBoostPredictor):
-        return 'XGBoost'
-    elif isinstance(model, GraphDeepNeuralNetworkPredictor):
-        return 'Graph Neural Network (GNN)'
-    elif isinstance(model, SmilesTransformerPredictor):
-        return 'Transformer'
-    elif isinstance(model, RecurrentNetworkPredictor):
-        return 'Recurrent Neural Network (RNN)'
-    else:
-        return str(type(model)).split("'")[1].split(".")[-1]
-
-
 def _load_model(path_to_pickled_model):
     with open(path_to_pickled_model, 'rb') as f:
         model_dict = pickle.load(f)
@@ -96,6 +67,10 @@ def get_available_predictors(dir_of_all_predictors):
     if isinstance(dir_of_all_predictors, str):
         dir_of_all_predictors = Path(dir_of_all_predictors)
 
+    print(dir_of_all_predictors)
+    print('exists', dir_of_all_predictors.exists())
+    print('is_dir', dir_of_all_predictors.is_dir())
+
     # look through all dataset_spect.pkl files in model_dir
     for exp_spec_file in dir_of_all_predictors.rglob('*/experiment_specification.pkl'):
 
@@ -126,5 +101,6 @@ def get_available_predictors(dir_of_all_predictors):
     return available_predictors
 
 if __name__ == '__main__':
-    dir = Path('/home/johbro/PycharmProjects/rise-qsar/models')
+    # dir = Path('/home/johbro/PycharmProjects/rise-qsar/models')
+    dir = Path('experiments')
     get_available_predictors(dir)
