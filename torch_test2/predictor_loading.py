@@ -67,10 +67,6 @@ def get_available_predictors(dir_of_all_predictors):
     if isinstance(dir_of_all_predictors, str):
         dir_of_all_predictors = Path(dir_of_all_predictors)
 
-    print(dir_of_all_predictors)
-    print('exists', dir_of_all_predictors.exists())
-    print('is_dir', dir_of_all_predictors.is_dir())
-
     # look through all dataset_spect.pkl files in model_dir
     for exp_spec_file in dir_of_all_predictors.rglob('*/experiment_specification.pkl'):
 

@@ -50,12 +50,38 @@ class Predict(Resource):
         print(type(preds))
         return {'preds': preds}
 
+test_args = reqparse.RequestParser()
+test_args.add_argument('smiles', type=str, help='Molecule in SMILES format', required=True)
+test_args.add_argument('endpoint', type=str, help='Property endpoint which we want to predict', required=True)
+test_args.add_argument('predictor_idx', type=int, help='Index of predictor given in the predictor dictionary', required=True)
+
+
+class TestArgumentPassing(Resource):
+
+    def get(self):
+        args = test_args.parse_args()
+        return {'smiles': args.smiles,
+                'endpoint': args.endpoint,
+                'preditor_idx': args.predictor_idx}
+
+class TestRunModels(Resource):
+
+    def get(self):
+        predictor = available_predictors['hERG'][0]
+        featurized_mol = predictor['models'][0].featurizer.featurize(['CCC']).values
+        preds = [model.predict_proba_featurized(featurized_mol)[0] for model in predictor['models']]
+        print(preds)
+        print(type(preds))
+        return {'preds': preds}
 
 api.add_resource(AvailablePredictors, '/available_predictors')
 api.add_resource(Predict, '/predict')
+api.add_resource(TestArgumentPassing, '/argpass')
+api.add_resource(TestRunModels, '/modelpass')
 
 
 if __name__ == "__main__":
     available_predictors, available_predictor_references = init('experiments')
     # app.run(host='0.0.0.0')
+    print(available_predictors)
     app.run(debug=True, host='0.0.0.0')
