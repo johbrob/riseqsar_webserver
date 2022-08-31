@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, RadioField, SelectField
 from wtforms.validators import DataRequired, Length, InputRequired
-from flaskresources.custom_wtform_validators import IsValidSMILES
+from custom_wtform_validators import IsValidSMILES
 
 
 class SmilesPredictForm(FlaskForm):

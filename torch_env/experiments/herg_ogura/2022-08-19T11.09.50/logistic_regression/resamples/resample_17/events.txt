@@ -1,0 +1,10 @@
+00 2022-08-19T16:15:10:	Starting hp optimization trial 0
+01 2022-08-19T16:18:39 [0:03:29 since event 0]:	Finished hp optimization trial 0
+02 2022-08-19T16:18:41:	Starting hp optimization trial 1
+03 2022-08-19T16:22:12 [0:03:31 since event 2]:	Finished hp optimization trial 1
+04 2022-08-19T16:22:14:	Starting hp optimization trial 2
+05 2022-08-19T16:25:44 [0:03:30 since event 4]:	Finished hp optimization trial 2
+06 2022-08-19T16:25:45:	Starting hp optimization trial 3
+07 2022-08-19T16:29:15 [0:03:30 since event 6]:	Finished hp optimization trial 3
+08 2022-08-19T16:29:17:	Starting hp optimization trial 4
+09 2022-08-19T16:32:48 [0:03:31 since event 8]:	Finished hp optimization trial 4

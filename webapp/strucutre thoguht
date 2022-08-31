@@ -1,0 +1,6 @@
+1. one script to spin up all necessary containers
+
+2. spin up the flask app which is aware of containers
+
+
+
