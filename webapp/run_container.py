@@ -1,5 +1,8 @@
 import sys
 import docker
+import getpass
+import os
+
 
 def query_yes_no(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
@@ -37,8 +40,10 @@ def run(username, password):
     client = docker.from_env()
     # login
     client.login(username=username, password=password, registry='https://registry-1.docker.io/')
+    print('logged in')
     # load image
     img = client.images.pull('johbrob/rq-torch-env')
+    print('pulled image')
     # should maybe try to find available port
     # run container of image
     try:
@@ -64,12 +69,12 @@ def r():
 
 def main():
     import os
-    print(f'beginning running subprocess {os.getpid()}\n')
-    #run(sys.argv[1], sys.argv[2])
-    a = r()
-    print(f'finishing running subprocess {os.getpid()}\n')
-    #return [sys.argv[0], sys.argv[1]]
-    return a
+    #user = getpass.getuser()
+    user = input('enter dockerhub username: ')
+    print(f'enter password for {user}')
+    password = getpass.getpass()
+    run(user, password)
+
 
 
 if __name__ == '__main__':

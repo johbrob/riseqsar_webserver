@@ -1,4 +1,5 @@
 import rdkit
+import rdkit.Chem
 from wtforms.validators import ValidationError
 
 

@@ -6,7 +6,7 @@ from custom_wtform_validators import IsValidSMILES
 
 class SmilesPredictForm(FlaskForm):
     smiles = StringField('SMILES', validators=[DataRequired(), Length(min=1, max=500), IsValidSMILES()])
-    endpoint = RadioField('Endpoint')
+    endpoint = RadioField('Endpoint', validators=[InputRequired()])
     model = SelectField('Model', choices=['Choose model after selecting endpoint'], id='model')
     submit = SubmitField('Predict')
 

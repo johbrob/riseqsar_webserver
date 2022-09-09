@@ -30,7 +30,7 @@
             {% else %}
               {% for ep in form.endpoint %}
                 <tr>
-                  <td>{{ ep(class="endpoint") }}</td>
+                  <td>{{ ep(class="endpoint", required="required") }}</td>
                   <td>{{ ep.label(class="endpoint") }}</td>
                 </tr>
               {% endfor %}
