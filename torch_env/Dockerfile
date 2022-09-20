@@ -1,26 +1,21 @@
-# syntax=docker/dockerfile:
+# syntax=docker/dockerfile:1
 
-#FROM 1.11.0-cuda11.3-cudnn8-runtime
 FROM pytorch/pytorch
 FROM python:3.9-slim-buster
 
-# haven't tried this command but is suggested. Works without it
-CMD python -m pip install --upgrade pip
+EXPOSE 5000
 
 WORKDIR /app
 
-#CMD apt install python3.9
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
+COPY ChEMBL_Structure_Pipeline ChEMBL_Structure_Pipeline
+COPY requirements.txt .
+COPY api.py predictor_loading.py setup.py ./
+COPY riseqsar riseqsar
+COPY experiments experiments
 
-#COPY torch_environment.yml torch_environment.yml
-#RUN conda env create -f torch_environment.yml
-
-
-COPY . .
-RUN pip install ./ChEMBL_Structure_Pipeline
-
-#CMD ["conda", "activate", "rise-qsar-torch"]
-CMD pip install -e .
+RUN python -m pip install --upgrade pip && \
+ 	pip install -r requirements.txt && \
+	pip install ./ChEMBL_Structure_Pipeline && \
+	pip install -e .
 
 CMD ["python3", "api.py"]

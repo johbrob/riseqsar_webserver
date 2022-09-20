@@ -1,7 +1,7 @@
 import requests
 
 #BASE = "http://127.0.0.1:5000/"
-BASE = "http://0.0.0.0:3000/"
+BASE = "http://0.0.0.0:3001/"
 
 responce = requests.get(BASE + '/predict', {'smiles': 'CCC', 'endpoint': 'hERG', 'predictor_idx': 0})
 print(responce)

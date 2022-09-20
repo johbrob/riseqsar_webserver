@@ -1,9 +1,11 @@
-import subprocess
-
 from flask import Flask, request, render_template, url_for, flash, redirect, session
 from flask.json import jsonify
 import os
 import sys
+from rdkit import Chem
+import rdkit.Chem.Draw as Draw
+import io
+import base64
 
 import argparse
 sys.path.append(os.getcwd())
@@ -16,18 +18,42 @@ STATIC_FOLDER = '/static'
 UPLOAD_FOLDER = '/uploads'
 
 #app = Flask(__name__, template_folder=TEMPLATE_FOLDER, static_folder=STATIC_FOLDER, )
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 app.config['SECRET_KEY'] = 'bfa7f83bbb83053cbccc82017295e703'
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 available_predictors = {}  # all available models with endpoints as keys
+
+
+def draw_mol(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    mol_img = Draw.MolToImage(mol)
+    return mol_img
+
+def draw_n_save_mol(smiles):
+    mol = Chem.MolFromSmiles(smiles)
+    print('entering')
+    print(os.getcwd())
+    a = Draw.MolToFile(mol, 'webapp/tmp/mol.png')
+    from pathlib import Path
+    print(Path('webapp/tmp/mol.png').is_file())
+
+
+
+def PIL2b64(pil_img):
+    image_io = io.BytesIO()
+    pil_img.save(image_io, format='PNG')
+    encoded = base64.b64encode(image_io.getvalue()).decode("utf-8")
+    return encoded
 
 
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/home/", methods=['GET', 'POST'])
 def home():
     form = create_SmilesPredictForm(available_predictors.keys())
+
     if request.method == 'POST':
 
         # update model choices
@@ -38,28 +64,73 @@ def home():
             flash(form.errors)
 
         if form.validate_on_submit():
+
+            print(form.model.data)
             predictor = available_endpoint_predictors[int(form.model.data)]
 
-            session['prediction'] = {'smiles': form.smiles.data,
-                                     'endpoint': form.endpoint.data,
-                                     'predictor': predictor['name']}
+            flash(f'{form.endpoint.data} property predicted for {form.smiles.data} using {predictor["name"]}',
+                  'success')
+            return redirect(url_for('prediction',
+                                    smiles=form.smiles.data,
+                                    property_endpoint=form.endpoint.data,
+                                    predictor_idx=int(form.model.data)))
+
+    return render_template('home.html', form=form)
+
+
+@app.route("/prediction/<smiles>/<property_endpoint>/<predictor_idx>", methods=['GET', 'POST'])
+def prediction(smiles, property_endpoint, predictor_idx):
+    form = create_SmilesPredictForm(available_predictors.keys())
+
+    print(0, predictor_idx)
+
+    if request.method == 'POST':
+
+        # update model choices
+        available_endpoint_predictors = available_predictors[form.endpoint.data]
+        form.model.choices = [(p['idx'], p['idx']) for p in available_endpoint_predictors]
+
+        if form.errors:
+            flash(form.errors)
+
+        if form.validate_on_submit():
+            print(1, form.model.data)
+            predictor = available_endpoint_predictors[int(form.model.data)]
 
             flash(f'{form.endpoint.data} property predicted for {form.smiles.data} using {predictor["name"]}',
                   'success')
 
-            request_args = {'smiles': form.smiles.data,
-                            'endpoint': form.endpoint.data,
-                            'predictor_idx': int(form.model.data)}
-            responce = requests.get(predictor['ip_address'] + '/predict', request_args)
-            print(str(responce))
-            session['prediction']['preds'] = responce.json()['preds']
-            return redirect(url_for('home'))
+            return redirect(url_for('prediction',
+                                    smiles=form.smiles.data,
+                                    property_endpoint=form.endpoint.data,
+                                    predictor_idx=int(form.model.data)))
 
-    if 'prediction' in session:
-        prediction = session.pop('prediction')
-        plot = create_plot(prediction.pop('preds'))
-        return render_template('molpredict.html', form=form, plot=plot, prediction=prediction)
-    return render_template('molpredict.html', form=form)
+    predictor = available_predictors[property_endpoint][int(predictor_idx)]
+    responce = requests.get(url=predictor['ip_address'] + '/predict',
+                            params={'smiles': smiles,
+                                    'endpoint': property_endpoint,
+                                    'predictor_idx': int(predictor_idx)})
+    print(str(responce))
+    preds = responce.json()['preds']
+    mol_img = PIL2b64(draw_mol(smiles))
+    #draw_n_save_mol(smiles)
+    pred_plot = create_plot(preds)
+
+    print(2, predictor_idx, form.model.data)
+
+    return render_template('molpredict.html',
+                           form=form,
+                           plot=pred_plot,
+                           mol_img=mol_img,
+                           prediction={'smiles': smiles,
+                                       'endpoint': property_endpoint,
+                                       'preds': preds,
+                                       'pred_plot': pred_plot,
+                                       'predictor': predictor['name']})
+
+
+
+
 
 
 @app.route("/model/<endpoint>")
@@ -101,7 +172,7 @@ if __name__ == "__main__":
     parser.add_argument('--debug', type=bool, default=True)
     args = parser.parse_args()
 
-    BASE = "http://0.0.0.0:3000"
+    BASE = "http://0.0.0.0:3001"
 
     responce = requests.get(BASE + '/available_predictors')
     print(str(responce))

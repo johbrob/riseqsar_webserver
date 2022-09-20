@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+      <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+          <legend class="border-bottom mb-4">Make Molecule Property Prediction</legend>
+          <div class="form-group">
+            {{ form.smiles.label(class="form-control-label") }}
+            {% if form.smiles.errors %}
+              {{ form.smiles(class="form-control form-control-lg") }}
+              <div class="invalid-feedback d-block">
+                {% for error in form.smiles.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.smiles(class="form-control form-control-lg") }}
+            {% endif %}
+          </div>
+          <div class="form-group">
+            {{ form.endpoint.label(class="form-control-label") }}
+            {% if form.endpoint.errors %}
+              {{ form.endpoint(class="form-control form-control-lg") }}
+              <div class="invalid-feedback d-block">
+                {% for error in form.endpoint.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {% for ep in form.endpoint %}
+                <tr>
+                  <td>{{ ep(class="endpoint", required="required") }}</td>
+                  <td>{{ ep.label(class="endpoint") }}</td>
+                </tr>
+              {% endfor %}
+            {% endif %}
+          </div>
+          <div class="form-group">
+            {{ form.model.label(class="form-control-label") }}
+            {% if form.model.errors %}
+              {{ form.model(class="form-control form-control-lg") }}
+              <div class="invalid-feedback d-block">
+                {% for error in form.model.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.model.label }}
+              {{ form.model }}
+            {% endif %}
+          </div>
+        </fieldset>
+        <div class="form-group">
+          {{ form.submit(class="btn btn-primary") }}
+        </div>
+        <script src="{{ url_for('static', filename='js/update_model_dropdown.js') }}"></script>
+      </form>
+    </div>
+
+
+
+{% endblock content %}
+
