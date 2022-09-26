@@ -1,3 +1,4 @@
 torch_test2/experiments
 __pycache__/
 .idea/
+/webapp/.env

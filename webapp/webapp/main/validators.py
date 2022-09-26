@@ -12,4 +12,3 @@ class IsValidSMILES(object):
     def __call__(self, form, field):
         if rdkit.Chem.MolFromSmiles(field.data) is None:
             raise ValidationError(self.message)
-
