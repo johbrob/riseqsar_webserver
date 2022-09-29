@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
-#FROM nvidia/cuda:9.0-cudnn7-devel
-FROM nvidia/cuda:9.1-cudnn7-devel-ubuntu16.04
+FROM nvidia/cuda:9.0-cudnn7-devel
+#FROM nvidia/cuda:9.1-cudnn7-devel-ubuntu16.04
 FROM python:3.9-slim-buster
 
 EXPOSE 5000
@@ -34,7 +34,7 @@ RUN	mkdir thundersvm/build
 #RUN whereis gcc
 #RUN whereis g++
 #RUN LIST(APPEND CMAKE_PROGRAM_PATH  "c:/usr/bin/" ...)
-
+RUN apt-get install nvidia-cuda-toolkit -y
 RUN find / -type d -name 'cuda'
 WORKDIR /app/thundersvm/build
 RUN whereis cudatoolkit
