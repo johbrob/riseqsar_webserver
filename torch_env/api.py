@@ -40,14 +40,6 @@ class AvailablePredictors(Resource):
         return available_predictor_references
 
 
-class AvailablePredictors(Resource):
-    def get(self):
-        if not available_predictor_references:
-            print('Somethihng is not right...')
-
-        return available_predictor_references
-
-
 class PredictArgsSchema(Schema):
     smiles = fields.Str(required=True)
     endpoint = fields.Str(required=True)

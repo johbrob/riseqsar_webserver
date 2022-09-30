@@ -1,4 +1,5 @@
 torch_test2/experiments
 __pycache__/
+.DS_store
 .idea/
 /webapp/.env
