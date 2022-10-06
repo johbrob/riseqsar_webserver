@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  herg_ogura_random_forest:
+    build:
+      context: predictor_serving/images_v0/.
+      dockerfile: predictors/random_forest/Dockerfile.herg_ogura
+    ports:
+    - "3003:5000"
+  
+  #herg_ogura_logistic_regression:
+    #build:
+    #  context: predictor_serving/images_v0/.
+    #  dockerfile: predictors/logistic_regression/Dockerfile.herg_ogura
+    #ports:
+    #- "3003:5000"    
