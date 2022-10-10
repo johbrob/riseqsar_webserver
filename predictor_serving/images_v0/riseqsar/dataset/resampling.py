@@ -1,7 +1,8 @@
 import copy
 from dataclasses import dataclass, field
 from distutils.command.config import config
-from typing import Literal, List, Tuple, Sequence, Union, Dict, Optional
+from typing import List, Tuple, Sequence, Union, Dict, Optional
+from typing_extensions import Literal
 from collections import Counter, defaultdict
 
 from sklearn.model_selection import train_test_split

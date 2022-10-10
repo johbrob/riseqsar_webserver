@@ -55,7 +55,7 @@ class MolecularDataset(object):
         #if self.properties is not None:
 #            return self.molecules[item], *[target_values[item] for target_values in self.target_lists.values()], self.properties[item]
 #        else:
-        return self.molecules[item], *[target_values[item] for target_values in self.target_lists.values()],
+        return (self.molecules[item], *[target_values[item] for target_values in self.target_lists.values()])
 
     def get_metadata_keys(self):
         if self.properties is not None:

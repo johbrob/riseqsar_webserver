@@ -3,7 +3,8 @@ import pickle
 import warnings
 from pathlib import Path
 from dataclasses import dataclass, asdict
-from typing import Optional, Any, Literal
+from typing import Optional, Any
+from typing_extensions import Literal
 
 warnings.filterwarnings('ignore')
 
