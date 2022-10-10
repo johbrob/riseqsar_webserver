@@ -1,5 +1,6 @@
 import pickle
-from typing import Union, List, Literal, Optional
+from typing import Union, List, Optional
+from typing_extensions import Literal
 from pathlib import Path
 
 import pandas as pd

@@ -7,7 +7,8 @@ from collections import Collection
 from dataclasses import dataclass, field
 from pathlib import Path
 import types
-from typing import Sequence, Mapping, Type, Dict, Any, Optional, List, Union, Literal
+from typing import Sequence, Mapping, Type, Dict, Any, Optional, List, Union
+from typing_extensions import Literal
 
 import numpy as np
 import optuna
