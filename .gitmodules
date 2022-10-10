@@ -1,3 +1,0 @@
-[submodule "torch_env/ChEMBL_Structure_Pipeline"]
-	path = torch_env/ChEMBL_Structure_Pipeline
-	url = git@github.com:chembl/ChEMBL_Structure_Pipeline.git
