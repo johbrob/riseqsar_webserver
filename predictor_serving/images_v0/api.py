@@ -1,7 +1,8 @@
-import json
+import argparse
+import os
+import pathlib
 import pprint
 from flask import Flask, session, request, abort
-from flask.json import jsonify
 from flask_restful import Resource, Api
 from marshmallow import Schema, fields
 from marshmallow.validate import Range
@@ -60,7 +61,6 @@ class Predict(Resource):
         predictor = available_predictors[request.args['endpoint']][int(request.args['predictor_idx'])]
 
         # featurize with one process using featurizer of first model
-        predictor['models'][0].featurizer.set_nproc(1)
         featurized_mol = predictor['models'][0].featurizer.featurize([request.args['smiles']]).values
 
         # make predictions
@@ -71,7 +71,11 @@ class Predict(Resource):
 api.add_resource(AvailablePredictors, '/available_predictors')
 api.add_resource(Predict, '/predict')
 
+print(os.getcwd())
+print(pathlib.Path('predictors').is_dir())
+print(pathlib.Path('images_v0/predictors').is_dir())
+available_predictors, available_predictor_references = init('predictors')
+pprint.pprint(available_predictor_references)
+
 if __name__ == "__main__":
-    available_predictors, available_predictor_references = init('predictors')
-    pprint.pprint(available_predictor_references)
     app.run(debug=True, host='0.0.0.0')

@@ -3,22 +3,40 @@
 FROM condaforge/mambaforge:4.14.0-0 as conda
 
 EXPOSE 5000
-WORKDIR /app
+#WORKDIR /app
 
-COPY environments/conda-linux-64.lock .
-RUN mamba create --copy -p /env --file conda-linux-64.lock && conda clean -afy
+COPY images_v0/environments/conda-linux-64.lock .
+#RUN mamba create --copy -p /env --file conda-linux-64.lock && conda clean -afy
+RUN --mount=type=cache,target=/opt/conda/pkgs mamba create --copy -p /env --file conda-linux-64.lock
 
 COPY ChEMBL_Structure_Pipeline ChEMBL_Structure_Pipeline
-COPY api.py predictor_loading.py setup.py ./
-COPY riseqsar riseqsar
-COPY predictors/random_forest/herg_ogura	predictors
+COPY images_v0/api.py images_v0/predictor_loading.py images_v0/setup.py ./
+COPY images_v0/riseqsar riseqsar
+COPY images_v0/predictors/random_forest/herg_ogura	predictors
 
-RUN conda run -p /env python -m pip install --no-deps ./ChEMBL_Structure_Pipeline
-RUN conda run -p /env python -m pip install --no-deps -e .
+RUN conda run -p /env python -m pip install --no-deps ./ChEMBL_Structure_Pipeline && \
+    conda run -p /env python -m pip install --no-deps -e .
+RUN rm -rf ./ChEMBL_Structure_Pipeline
+
+RUN find -name '*.a' -delete && \
+    rm -rf /env/conda-meta && \
+    rm -rf /env/include && \
+    find -name '__pycache__' -type d -exec rm -rf '{}' '+' && \
+    rm -rf /env/lib/python3.9/site-packages/pip /env/lib/python3.9/idlelib /env/lib/python3.9/ensurepip \
+        /env/lib/libasan.so.5.0.0 \
+        /env/lib/libtsan.so.0.0.0 \
+        /env/lib/liblsan.so.0.0.0 \
+        /env/lib/libubsan.so.1.0.0 \
+        /env/bin/x86_64-conda-linux-gnu-ld \
+        /env/bin/sqlite3 \
+        /env/bin/openssl \
+        /env/share/terminfo && \
+    rm -rf /env/lib/python3.9/site-packages/uvloop/loop.c
 
 # Distroless for execution
 FROM gcr.io/distroless/base-debian10
 
 COPY --from=conda /env /env
 
-CMD ["python3", "api.py"]
+#CMD ["python3", "api.py"]
+CMD ["/env/bin/gunicorn", "-w", "4", "-b", "localhost:5000", "api:app"]

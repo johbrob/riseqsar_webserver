@@ -64,13 +64,10 @@ def _get_predictor_info(models, path_to_predictor_dir, endpoint, available_predi
 
 def get_available_predictors(dir_of_all_predictors):
     available_predictors = {}
-
     if isinstance(dir_of_all_predictors, str):
         dir_of_all_predictors = Path(dir_of_all_predictors)
-
     # look through all dataset_spect.pkl files in model_dir
     for exp_spec_file in dir_of_all_predictors.rglob('*/experiment_specification.pkl'):
-
         exp_config_file = exp_spec_file.parent / Path('experiment_config.pkl')
         with open(exp_config_file, 'rb') as f:  # get endpoint form dataset_spec
             exp_config = pickle.load(f)
@@ -94,4 +91,5 @@ def get_available_predictors(dir_of_all_predictors):
 if __name__ == '__main__':
     # dir = Path('/home/johbro/PycharmProjects/rise-qsar/models')
     dir = Path('predictors')
-    get_available_predictors(dir)
+    a = get_available_predictors(dir)
+    print(a)

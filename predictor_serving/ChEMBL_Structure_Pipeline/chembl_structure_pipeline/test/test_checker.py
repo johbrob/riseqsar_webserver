@@ -1154,10 +1154,10 @@ M  END
 """
 
         self.assertEqual(checker.StereoChecker.get_stereo_counts(mb),
-                          (4, 4, 4))
+                         (4, 4, 4))
         self.assertFalse(checker.StereoChecker.check(mb))
         self.assertEqual(checker.StereoChecker.get_stereo_score(mb),
-                          ())
+                         ())
 
         mb = """
   Mrv1810 02151908442D
@@ -1795,5 +1795,5 @@ M  END"""
   1  7  1  0  0  0  0
 M  END"""
         self.assertEqual(checker.check_molblock(mb),
-  ((6, 'molecule has six (or more) atoms with exactly the same coordinates'),))
+                         ((6, 'molecule has six (or more) atoms with exactly the same coordinates'),))
 

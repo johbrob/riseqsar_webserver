@@ -75,7 +75,7 @@ def ensure_rd_mols(molecules):
 
 
 class MolecularFeaturizer(object):
-    def __init__(self, scaler_type='min_max'):
+    def __init__(self, scaler_type='min_max', nproc=None):
         self.fitted = False
         if scaler_type == 'min_max':
             self.scaler = MinMaxScaler()
@@ -119,7 +119,7 @@ class MolecularFeaturizer(object):
 
 
 #@cachier(stale_after=datetime.timedelta(days=3))
-def calculate_mordred_descriptors(molecules, desc=None, ignore_3d=True, num_workers=14):
+def calculate_mordred_descriptors(molecules, desc=None, ignore_3d=True, num_workers=1):
     from mordred import Calculator, descriptors
     #mols = [smiles_to_mol(smiles, standardize=True) for smiles in tqdm(smiles_list, desc='Chembl-standardiziation')]
     if desc is None:
