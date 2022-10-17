@@ -3,8 +3,11 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+    # - cudnn=8.4.1.50=hed8a83a_0
+    # - magma=2.5.4=h6103c52_2
+    # - nccl=2.14.3.1=h0800d71_0
   - pytorch
-  - cudatoolkit=10.2
+    # - cudatoolkit=11.7.9=hd8887f6_10 #10.2
   - python=3.9
   - pip
   - numpy #=1.22
