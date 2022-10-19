@@ -5,18 +5,27 @@ services:
       context: predictor_serving/.
       dockerfile: images_v0/predictors/random_forest/Dockerfile.herg_ogura
     ports:
-    - "3002:5000"
+      - "3002:5000"
   
-  herg_ogura_feed_forward_network:
-    build:
-      context: predictor_serving/.
-      dockerfile: images_v0/predictors/ffn/Dockerfile.herg_ogura
-    ports:
-    - "3003:5000"    
+  #herg_ogura_feed_forward_network:
+  #  build:
+  #    context: predictor_serving/.
+  #    dockerfile: images_v0/predictors/ffn/Dockerfile.herg_ogura
+  #  ports:
+  #  - "3003:5000"    
+  
   webapp:
     build:
       context: webapp/
       dockerfile: Dockerfile
     ports:
-    - "5000:5000"
-    env_file: webapp/.env.dev
+      - "5001:5000"
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - webapp
+    ports:
+      - "80:80"

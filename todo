@@ -1,0 +1,4 @@
+Fix trained model directory
+Add way for predictor containers to register to server (either write to file or register with some kind of authetication)
+Fix thunder_svm predictor container
+Make database a separate container

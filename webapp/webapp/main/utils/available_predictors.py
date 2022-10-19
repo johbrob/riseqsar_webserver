@@ -20,10 +20,12 @@ def merge_predictor_dicts(*pred_dicts_and_ips):
     return all_predictors
 
 def available_predictors():
-    BASE = "http://0.0.0.0:3001"
-    responce = requests.get(BASE + '/available_predictors')
-    print(str(responce))
-    available_torch_predictors = responce.json()
-    available_other_predictors = {'hERG': [{'name': 'OtherPredictor 2022-08-01-T12.12.12', 'idx': 0}]}
-    return merge_predictor_dicts((available_torch_predictors, BASE),
-                                                 (available_other_predictors, "http://0.0.0.0:3001"))
+    predictor_addreses = ['http://riseqsar_webserver-herg_ogura_random_forest-1:5000']
+
+    predictors = [] # list of tuples containing request responces and the corresponding addresses
+
+    for address in predictor_addreses:
+       responce = requests.get(address + '/available_predictors')
+       predictors.append((responce.json(), address)) # append responce and address
+
+    return merge_predictor_dicts(*predictors)
