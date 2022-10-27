@@ -19,11 +19,16 @@ def merge_predictor_dicts(*pred_dicts_and_ips):
 
     return all_predictors
 
+
+def _check_for_predictor(address):
+    print(address + '/available_predictors')
+    responce = requests.get(address + '/available_predictors')
+    print(responce)
+    return responce.json()
+
 def available_predictors():
-    BASE = "http://0.0.0.0:3001"
-    responce = requests.get(BASE + '/available_predictors')
-    print(str(responce))
-    available_torch_predictors = responce.json()
-    available_other_predictors = {'hERG': [{'name': 'OtherPredictor 2022-08-01-T12.12.12', 'idx': 0}]}
-    return merge_predictor_dicts((available_torch_predictors, BASE),
-                                                 (available_other_predictors, "http://0.0.0.0:3001"))
+    available_ports = ['http://tmp_docker_test-herg_ogura_feed_forward_network-1:5000', 'http://tmp_docker_test-herg_ogura_random_forest-1:5000']
+
+    all_predictors = [(_check_for_predictor(port), port) for port in available_ports]
+    [print(str(predictor[0]), predictor[1]) for predictor in all_predictors]
+    return merge_predictor_dicts(*all_predictors)

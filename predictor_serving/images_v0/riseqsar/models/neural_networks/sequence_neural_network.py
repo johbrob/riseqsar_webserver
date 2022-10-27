@@ -84,7 +84,7 @@ class SequenceNeuralNetwork(DeepNeuralNetwork):
                 sampler = WeightedRandomSampler(samples_weight, len(samples_weight))
                 dataloader = DataLoader(dataset,
                                         batch_size=self.config.batch_size,
-                                        # shuffle=is_training,
+                                        #shuffle=is_training,
                                         sampler=sampler,
                                         num_workers=self.config.num_dl_workers,
                                         collate_fn=collate_fn,
@@ -189,11 +189,11 @@ class SequenceNeuralNetwork(DeepNeuralNetwork):
     def predict_dataset_proba(self, dataset: RDKitTorchDataset):
         with torch.no_grad():
             dataloader = self.setup_dataloader(dataset, is_training=False)
-            batch_predictions = [self.predict_on_batch(batch).detach().cpu() for batch in dataloader]
+            batch_predictions = [self.predict_on_batch(batch).detach().cpu() for batch in tqdm(dataloader, desc='predict on dataset_proba')]
             dataset_predictions = torch.cat(batch_predictions, dim=0)
             dataset_probas = torch.sigmoid(dataset_predictions)
             return dataset_probas.detach().numpy()
 
     def predict_dataset(self, dataset: RDKitMolDataset):
-        prediction = [self.predict(smiles) for smiles in dataset]
+        prediction = [self.predict(smiles) for smiles in tqdm(dataset, desc='predict dataset')]
         return prediction

@@ -13,6 +13,7 @@ main = Blueprint('main', __name__)
 predictors = available_predictors()
 
 
+
 @main.route("/", methods=['GET', 'POST'])
 @main.route("/home/", methods=['GET', 'POST'])
 @login_required

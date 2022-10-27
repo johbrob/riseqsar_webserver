@@ -32,6 +32,9 @@ class HigherIsBetterMetric(EvaluationMetric):
     def cmp(self, a, b):
         return a > b
 
+    def __repr__(self):
+        return f'HigherIsBetterMetric({self.name})'
+
 
 class LowerIsBetterMetric(EvaluationMetric):
     def __init__(self, name):
@@ -40,6 +43,10 @@ class LowerIsBetterMetric(EvaluationMetric):
 
     def cmp(self, a, b):
         return a < b
+
+    def __repr__(self):
+        return f'LowerIsBetterMetric({self.name})'
+
 
 
 class Performance(object):
@@ -86,6 +93,7 @@ class PerformanceCollection(object):
         :param value_map:
         :return:
         """
+
         performances = [Performance(metric, value_map[metric.name]) for metric in self.metrics]
         return PerformanceCollection(performances)
 

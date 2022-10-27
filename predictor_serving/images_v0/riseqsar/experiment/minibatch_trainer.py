@@ -198,5 +198,7 @@ def checkpoint(*,
             best_model_resolved_reference = experiment_tracker.lookup_reference(BEST_MODEL)
             if keep_snapshots == 'best':
                 # We should only keep the all time best model, so we remove the previous best
-                experiment_tracker.delete_model(best_model_resolved_reference)
+                # It might have been removed before, so check whether the reference exists before
+                if experiment_tracker.reference_exists(best_model_resolved_reference):
+                    experiment_tracker.delete_model(best_model_resolved_reference)
         experiment_tracker.make_reference(BEST_MODEL, model_reference)

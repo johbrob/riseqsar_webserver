@@ -25,8 +25,7 @@ class DescriptorbasedPredictor(MolecularPredictor):
         self.featurizer = None
         self.model = None
 
-    def fit(self, *, train_dataset: FeaturizedDataset, evaluation_metrics: List[EvaluationMetric], dev_dataset=None,
-            experiment_tracker=None):
+    def fit(self, *, train_dataset: FeaturizedDataset, evaluation_metrics: List[EvaluationMetric], dev_dataset=None, experiment_tracker=None):
         if self.featurizer is None:
             self.featurizer = train_dataset.featurizer
 
@@ -67,24 +66,21 @@ class DescriptorbasedPredictor(MolecularPredictor):
         dataset_specs_collection = experiment_config.dataset_spec_collection
         dataset_config = experiment_config.model_specification.dataset_config
         train_dataset_spec = dataset_specs_collection.by_intended_use(TRAIN)
-        train_dataset = cls.dataset_class.from_dataset_spec(dataset_spec=train_dataset_spec, config=dataset_config,
-                                                            tag=TRAIN)
+        train_dataset = cls.dataset_class.from_dataset_spec(dataset_spec=train_dataset_spec, config=dataset_config, tag=TRAIN)
         featurizer = train_dataset.featurizer
-
+        
         try:
             dev_dataset_spec = dataset_specs_collection.by_intended_use(DEV)
-            dev_dataset = cls.dataset_class.from_dataset_spec(dataset_spec=dev_dataset_spec, config=dataset_config,
-                                                              tag=DEV,
-                                                              featurizer=featurizer)
-
+            dev_dataset = cls.dataset_class.from_dataset_spec(dataset_spec=dev_dataset_spec, config=dataset_config, tag=DEV,
+                                                     featurizer=featurizer)
+        
         except MissingDatasetSpecError:
             print("Dataset specs has no dev set described")
             dev_dataset = None
         try:
             test_dataset_spec = dataset_specs_collection.by_intended_use(TEST)
-            test_dataset = cls.dataset_class.from_dataset_spec(dataset_spec=test_dataset_spec, config=dataset_config,
-                                                               tag=TEST,
-                                                               featurizer=featurizer)
+            test_dataset = cls.dataset_class.from_dataset_spec(dataset_spec=test_dataset_spec, config=dataset_config, tag=TEST,
+                                                      featurizer=featurizer)
         except MissingDatasetSpecError:
             print("Dataset specs has no test set described")
             test_dataset = None

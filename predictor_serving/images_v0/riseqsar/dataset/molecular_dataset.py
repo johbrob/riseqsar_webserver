@@ -3,6 +3,7 @@ import copy
 from dataclasses import dataclass
 
 import numpy as np
+import pandas as pd
 
 from riseqsar.dataset.dataset_specification import DatasetSpec
 from riseqsar.dataset.resampling import ResamplingConfig, CrossvalidationConfig, SubsamplingConfig
@@ -36,6 +37,11 @@ class MolecularDataset(object):
             self.target_lists = {target_name: [target_values[i] for i in self.indices]
                                  for target_name, target_values in target_lists.items()}
 
+    def properties_to_csv(self, path):
+        """Dumps the properties of this dataset to the given path as a CSV"""
+        df = pd.DataFrame.from_records(self.properties)
+        df.to_csv(path, index=False)
+
     def make_copy(self, dataset_spec=None, identifier=None, tag=None):
         "Return a copy of this dataset"
         if dataset_spec is None:
@@ -62,6 +68,17 @@ class MolecularDataset(object):
             return self.properties[0].keys()
         else:
             return []
+    
+    def has_properties(self):
+        return self.properties is not None
+
+    def add_properties(self, prop_name, new_properties):
+        """Adds properties to the dataset"""
+        if not self.has_properties():
+            self.properties = [dict() for i in range(len(self))]
+        assert len(new_properties) == len(self), "There needs to be as many new properties as there are molecules in this dataset"
+        for prop_dict, prop in zip(self.properties, new_properties):
+            prop_dict[prop_name] = prop
 
     def get_samples_weights(self):
         targets = self.get_only_targets()
@@ -86,8 +103,7 @@ class MolecularDataset(object):
     def __len__(self):
         return len(self.molecules)
 
-    def has_properties(self):
-        return self.properties is not None
+
 
     def get_smiles(self):
         raise NotImplementedError(f'get_smiles has not been implemented for {self.__class__.__name__}')

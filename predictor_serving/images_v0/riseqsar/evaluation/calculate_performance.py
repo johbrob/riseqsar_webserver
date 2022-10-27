@@ -18,6 +18,7 @@ import numpy as np
 
 from riseqsar.evaluation.constants import *
 from riseqsar.experiment.experiment_tracker import ExperimentTracker
+from riseqsar.util import listify
 
 def find_threshold(true_class, scores):
     """Find the threshold which optimizes the G-mean of specificity vs. sensitivity using Youden's J statistic"""
@@ -147,7 +148,7 @@ def calculate_performance(*, true_class,
         FDR = float('nan')
 
     my_output[FALSE_POSITIVE_RATE] = FPR
-    my_output[FALSE_NEGATIVE] = FNR
+    my_output[FALSE_NEGATIVE_RATE] = FNR
     my_output[FALSE_DISCOVERY_RATE] = FDR
 
     # Positive likelihood ratio
@@ -171,9 +172,9 @@ def calculate_performance(*, true_class,
     my_output[NEGATIVE_LIKELIHOOD_RATIO] = NLR
     my_output[DIAGNOSTIC_ODDS_RATIO] = DOR
 
-    predictions = dict(true_class=true_class,
-                       prediction_scores=prediction_scores,
-                       predicted_class=pred_class)
+    predictions = dict(true_class=listify(true_class),
+                       prediction_scores=listify(prediction_scores),
+                       predicted_class=listify(pred_class))
 
     experiment_tracker.log_performance(dataset_name, my_output, tag=tag)
     experiment_tracker.log_predictions(dataset_name, predictions, tag=tag)

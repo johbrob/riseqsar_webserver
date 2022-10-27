@@ -8,7 +8,7 @@ import numpy as np
 from riseqsar.dataset.molecular_dataset import MolecularDataset
 
 
-from riseqsar.dataset.dataset_specification import MissingDatasetSpecError
+from riseqsar.dataset.dataset_specification import DatasetSpec, MissingDatasetSpecError
 from riseqsar.dataset.constants import TRAIN, DEV, TEST
 from riseqsar.evaluation.calculate_performance import find_threshold
 from riseqsar.evaluation.performance import EvaluationMetric
@@ -31,12 +31,6 @@ class MolecularPredictor(object):
         self.threshold = None
         self.config = config
 
-    def train(self, do_train: bool = True):
-        raise NotImplementedError(f'train() has not been implemented for {self.__class__.__name__}')
-
-    def eval(self):
-        self.train(False)
-
     def fit(self, *, train_dataset: MolecularDataset, evaluation_metrics: List[EvaluationMetric], dev_dataset=None, experiment_tracker=None):
         raise NotImplementedError(f'fit() has not been implemented for {self.__class__.__name__}')
 
@@ -51,7 +45,9 @@ class MolecularPredictor(object):
         raise NotImplementedError(f'predict_dataset_proba() has not been implemented for {self.__class__.__name__}')
 
     def predict_dataset(self, dataset: MolecularDataset):
-        raise NotImplementedError(f'predict_dataset() has not been implemented for {self.__class__.__name__}')
+        probabilities = self.predict_dataset_proba(dataset)
+        binarized_predictions = (probabilities >= self.threshold).astype(int)
+        return binarized_predictions
 
     def predict_proba(self, smiles: str):
         raise NotImplementedError(f'predict_proba() has not been implemented for {self.__class__.__name__}')
@@ -92,7 +88,6 @@ class MolecularPredictor(object):
         train_dataset_spec = dataset_specs_collection.by_intended_use(TRAIN)
         dataset_config = experiment_config.model_specification.dataset_config
         train_dataset = cls.dataset_class.from_dataset_spec(dataset_spec=train_dataset_spec, config=dataset_config, tag=TRAIN)
-        
         try:
             dev_dataset_spec = dataset_specs_collection.by_intended_use(DEV)
             dev_dataset = cls.dataset_class.from_dataset_spec(dataset_spec=dev_dataset_spec, config=dataset_config, tag=DEV)
@@ -107,3 +102,5 @@ class MolecularPredictor(object):
             test_dataset = None
 
         return train_dataset, dev_dataset, test_dataset
+
+    

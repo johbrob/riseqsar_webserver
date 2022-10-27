@@ -117,3 +117,11 @@ def common_prefix(*paths: Sequence[Path]):
         return sorted((x for x, count in counter.items() if count >= len(paths)), key=lambda x: len(str(x)))[-1]
     except LookupError as e:
         raise ValueError('No common prefix found') from e
+
+
+def listify(collection):
+    '''Convert a possible nested collection to a 1D list'''
+    try:
+        return [x for sublist in collection for x in listify(sublist)]
+    except TypeError:
+        return [collection]

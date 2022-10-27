@@ -1,3 +1,5 @@
+from copy import deepcopy
+import gc
 from dataclasses import dataclass, field
 from typing import Union, List, Optional, Sequence, Mapping
 from collections import Counter
@@ -18,9 +20,16 @@ from riseqsar.dataset.constants import TRAIN, DEV, TEST
 from riseqsar.dataset.featurized_dataset import FeaturizedDataset, FeaturizedDatasetConfig
 from riseqsar.experiment.experiment import ExperimentTracker
 from riseqsar.experiment.minibatch_trainer import minibatch_train, MiniBatchTrainerConfig
-from riseqsar.evaluation.performance import EvaluationMetric, setup_performance
+from riseqsar.evaluation.performance import EvaluationMetric, Performance, setup_performance
 from riseqsar.evaluation.constants import ROC_AUC, BCE
 
+@dataclass
+class DataloaderConfig:
+    shuffle: bool = None
+    pin_memory: bool = True
+    drop_last: bool = False
+    timeout: float = 1
+    persistent_workers: bool = True
 
 
 class DNNConfig:
@@ -50,7 +59,10 @@ class DNNConfig:
                  optim_kwargs: Mapping = None,
                  scheduler_args: Sequence = None,
                  scheduler_kwargs: Mapping = None,
-                 device: str = 'cpu'
+                 device: str = 'cpu',
+                 train_dataloader_config: DataloaderConfig = None,
+                 dev_dataloader_config: DataloaderConfig = None,
+                 test_dataloader_config: DataloaderConfig = None
                  ):
         if encoder_args is None:
             encoder_args = tuple()
@@ -68,7 +80,13 @@ class DNNConfig:
             scheduler_args = tuple()
         if scheduler_kwargs is None:
             scheduler_kwargs = dict()
-
+        if train_dataloader_config is None:
+            train_dataloader_config = DataloaderConfig(shuffle=True, drop_last=False)
+        if dev_dataloader_config is None:
+            dev_dataloader_config = DataloaderConfig(shuffle=False, drop_last=False)
+        if test_dataloader_config is None:
+            test_dataloader_config = DataloaderConfig(shuffle=False, drop_last=False)
+        
         self.trainer_config = trainer_config
         self.encoder_class = encoder_class
         self.decoder_class = decoder_class
@@ -94,6 +112,9 @@ class DNNConfig:
         self.scheduler_args = scheduler_args
         self.scheduler_kwargs = scheduler_kwargs
         self.device = device
+        self.train_dataloader_config = train_dataloader_config
+        self.dev_dataloader_config = dev_dataloader_config
+        self.test_dataloader_config = test_dataloader_config
 
 
 class DeepNeuralNetwork(MolecularPredictor):
@@ -118,7 +139,6 @@ class DeepNeuralNetwork(MolecularPredictor):
         threshold = super().fit_threshold(dataset)
         self.initialization_params['threshold'] = threshold
 
-
     def setup_initialization_params(self, train_dataset):
         pass
 
@@ -135,9 +155,28 @@ class DeepNeuralNetwork(MolecularPredictor):
         params.extend(self.decoder.parameters())
         self.params = params
 
+    def setup_dataloader(self, *, dataset: MolecularDataset, is_training: bool): 
+        if is_training:
+            if self.config.weighted_sampler:
+                samples_weight = dataset.get_samples_weights()
+                sampler = WeightedRandomSampler(samples_weight, len(samples_weight))
 
-    def setup_dataloader(self, *, dataset: MolecularDataset, is_training: bool):
-        raise NotImplementedError()
+                dataloader = DataLoader(dataset,
+                                        batch_size=self.config.batch_size,
+                                        sampler=sampler,
+                                        drop_last=False,
+                                        num_workers=self.config.num_dl_workers,
+                                        pin_memory=True)
+                return dataloader
+
+        dataloader = DataLoader(dataset,
+                                batch_size=self.config.batch_size,
+                                shuffle=False,
+                                drop_last=False,
+                                num_workers=self.config.num_dl_workers,
+                                pin_memory=True)
+        return dataloader
+
 
     def fit(self, *, train_dataset: FeaturizedDataset, evaluation_metrics: List[EvaluationMetric], dev_dataset=None, experiment_tracker: ExperimentTracker=None):
         initial_performance = setup_performance(evaluation_metrics)
@@ -160,6 +199,8 @@ class DeepNeuralNetwork(MolecularPredictor):
             self.scheduler = None
         self.updates = 0
         self.update_batch_loss = []
+        
+        #self.autotune_batch_size(initial_performance=initial_performance, experiment_tracker=experiment_tracker, train_dataset=train_dataset, dev_dataset=dev_dataset)
 
         train_dataloader = self.setup_dataloader(dataset=train_dataset, is_training=True)
         dev_dataloader = self.setup_dataloader(dataset=dev_dataset, is_training=False)
@@ -174,6 +215,50 @@ class DeepNeuralNetwork(MolecularPredictor):
         # Since the experiment tracker will serialize _this_ model (self), we pick out the model attribute of it since
         # that holds all the important learnt stuff
         self.model = experiment_tracker.load_model(best_model_reference).model
+
+    def autotune_batch_size(self, *, initial_performance, train_dataset: MolecularDataset, dev_dataset: MolecularDataset, experiment_tracker: ExperimentTracker):
+        # We make a special starting model
+        initial_batch_size = self.config.batch_size
+        experiment_tracker.log_model('initial_model', self)
+        current_batch_size = self.config.batch_size # First try the batch size set by the config
+        training_config = deepcopy(self.config.trainer_config)
+
+        while current_batch_size > 1:
+            try:
+                #garbage_collection_cuda()
+                perf = deepcopy(initial_performance)
+                self.model = experiment_tracker.load_model('initial_model').model
+                
+                self.config.batch_size = current_batch_size
+                train_dataloader = self.setup_dataloader(dataset=train_dataset, is_training=True)
+                dev_dataloader = self.setup_dataloader(dataset=dev_dataset, is_training=False)
+                training_config.max_epochs = 1
+                training_config.keep_snapshots = 'none'
+            
+            
+                minibatch_train(model=self,
+                                training_dataset=train_dataloader,
+                                dev_dataset=dev_dataloader,
+                                experiment_tracker=experiment_tracker,
+                                training_config=training_config,
+                                scheduler=self.scheduler,
+                                initial_performance=perf)
+                break
+
+            except RuntimeError as exception:
+                # Only these errors should trigger an adjustment
+                if is_oom_error(exception):
+                    print(f"batch size {current_batch_size} caused a memory error, decreasing to {current_batch_size//2}")
+                    current_batch_size = current_batch_size // 2
+                    garbage_collection_cuda()
+                    continue
+                else:
+                    raise  # some other error not memory related
+                    
+        print(f"Setting batch size to {current_batch_size}")
+        self.config.batch_size = current_batch_size
+        self.model = experiment_tracker.load_model('initial_model').model
+
 
     def predict(self, smiles: str):
         raise NotImplementedError()
@@ -302,12 +387,7 @@ class DeepNeuralNetwork(MolecularPredictor):
             dataset_probas = torch.sigmoid(dataset_predictions)
             return dataset_probas.detach().cpu().numpy()
 
-    def predict_dataset(self, dataset: MolecularDataset):
-        with torch.no_grad():
-            dataloader = self.setup_dataloader(dataset=dataset, is_training=False)
-            batch_predictions = [self.predict_on_batch(batch) for batch in dataloader]
-            dataset_predictions = torch.cat(batch_predictions, dim=0)
-            return dataset_predictions.detach().cpu().numpy()
+    
 
     def serialize(self, working_dir, tag=None):
         # We want to handle things a bit differently. Essentially first 
@@ -337,15 +417,12 @@ class DeepNeuralNetwork(MolecularPredictor):
     def serialize(self, working_dir, tag=None):
         """Returns a factory function for recreating this model as well as the state required to do so"""
         from io import BytesIO
-        encoder_bytes = BytesIO()
-        decoder_bytes = BytesIO()
-        torch.save(self.encoder.state_dict(), encoder_bytes)
-        torch.save(self.decoder.state_dict(), decoder_bytes)
+        model_bytes = BytesIO()
+        torch.save(self.model.state_dict(), model_bytes)
         model_factory = load_dnn
         model_data = pickle.dumps(dict(model_class=type(self), 
                                        model_config=self.config, 
-                                       encoder_bytes=encoder_bytes.getvalue(), 
-                                       decoder_bytes=decoder_bytes.getvalue(),
+                                       model_bytes=model_bytes.getvalue(),
                                        initialization_params=self.initialization_params))
         return model_factory, model_data
 
@@ -362,13 +439,58 @@ def load_dnn(model_bytes) -> DeepNeuralNetwork:
     model.initialization_params.update(initialization_params)
     model.initialize_network()
     model.threshold = initialization_params['threshold']
+
+    model_bytes = torch.load(BytesIO(model_data['model_bytes']))  
+    model.model.load_state_dict(model_bytes)
     
-    encoder_bytes = torch.load(BytesIO(model_data['encoder_bytes']))
-    decoder_bytes = torch.load(BytesIO(model_data['decoder_bytes']))
-
-    model.encoder.load_state_dict(encoder_bytes)
-    model.decoder.load_state_dict(decoder_bytes)
-
     return model
 
 
+def is_oom_error(exception: BaseException) -> bool:
+    return is_cuda_out_of_memory(exception) or is_cudnn_snafu(exception) or is_out_of_cpu_memory(exception)
+
+
+# based on https://github.com/BlackHC/toma/blob/master/toma/torch_cuda_memory.py
+def is_cuda_out_of_memory(exception: BaseException) -> bool:
+    oom_error = (isinstance(exception, RuntimeError)
+        and len(exception.args) == 1
+        and "CUDA" in exception.args[0]
+        and "out of memory" in exception.args[0])
+    illegal_memory_access = (isinstance(exception, RuntimeError)
+        and len(exception.args) == 1
+        and "CUDA error: an illegal memory access was encountered" in exception.args[0])
+    return oom_error or illegal_memory_access
+
+
+# based on https://github.com/BlackHC/toma/blob/master/toma/torch_cuda_memory.py
+def is_cudnn_snafu(exception: BaseException) -> bool:
+    # For/because of https://github.com/pytorch/pytorch/issues/4107
+    cudnn_not_supported = (isinstance(exception, RuntimeError) 
+              and len(exception.args) == 1
+              and "cuDNN error: CUDNN_STATUS_NOT_SUPPORTED." in exception.args[0])
+    cudnn_failed = (isinstance(exception, RuntimeError) 
+              and len(exception.args) == 1
+              and "cuDNN error: CUDNN_STATUS_EXECUTION_FAILED" in exception.args[0])
+    return (cudnn_not_supported or cudnn_failed)
+
+
+# based on https://github.com/BlackHC/toma/blob/master/toma/cpu_memory.py
+def is_out_of_cpu_memory(exception: BaseException) -> bool:
+    return (
+        isinstance(exception, RuntimeError)
+        and len(exception.args) == 1
+        and "DefaultCPUAllocator: can't allocate memory" in exception.args[0]
+    )
+
+
+# based on https://github.com/BlackHC/toma/blob/master/toma/torch_cuda_memory.py
+def garbage_collection_cuda() -> None:
+    """Garbage collection Torch (CUDA) memory."""
+    gc.collect()
+    try:
+        # This is the last thing that should cause an OOM error, but seemingly it can.
+        torch.cuda.empty_cache()
+    except RuntimeError as exception:
+        if not is_oom_error(exception):
+            # Only handle OOM errors
+            raise

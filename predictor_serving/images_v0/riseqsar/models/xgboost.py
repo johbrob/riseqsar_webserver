@@ -91,9 +91,10 @@ class XGBoostPredictor(DescriptorbasedPredictor):
         return prediction
 
     def predict_featurized(self, featurized_mols):
-        raise NotImplementedError("predict_featurized not implemented for XGBoostPredictor")
-        #prediction = self.model.predict(featurized_mols)
-        #return prediction
+        if not hasattr(self, 'threshold'):
+            raise RuntimeError("Can't make class predictions without threshold, fit it first")
+        predictions = self.predict_proba_featurized(featurized_mols)
+        return (predictions >= self.threshold).astype(int)
 
     def serialize(self, working_dir: Path, tag=None):
         """Returns a factory function for recreating this model as well as the state required to do so"""

@@ -188,15 +188,18 @@ class MolecularGraph(object):
             bond_features = BOND_FEATURES
         atoms = make_atom_features(rd_mol, atom_features)
         bonds = make_bond_features(rd_mol, bond_features)
-        shortest_paths = make_shortest_paths(rd_mol)
-        ring_paths = make_ring_paths(rd_mol)
+        #shortest_paths = make_shortest_paths(rd_mol)
+        #ring_paths = make_ring_paths(rd_mol)
+        shortest_paths = None
+        ring_paths = None
         if smiles is None:
             smiles = Chem.MolToSmiles(rd_mol, canonical=True)
         return MolecularGraph(smiles=smiles,
                               atom_features=atoms,
                               bond_features=bonds,
                               shortest_paths=shortest_paths,
-                              rings=ring_paths)
+                              rings=ring_paths
+                              )
 
     def get_atom_features(self, atom_feature_spec=None):
         if atom_feature_spec is None:
@@ -418,7 +421,7 @@ class MolecularGraphDataset(RDKitMolDataset):
         file_name = dataset_spec.file_name
         base_name = file_name.with_suffix('').name
         
-        dataset_dir = file_name.parent / 'graph_dataset'
+        dataset_dir = file_name.parent / f'{base_name}_graph_dataset'
         datafields_path = dataset_dir / 'dataset_fields.pkl'
         pickled_graphs_path = dataset_dir / 'pickled_graphs'
         

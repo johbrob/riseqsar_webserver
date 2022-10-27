@@ -1,8 +1,7 @@
-import argparse
 import os
 import pathlib
 import pprint
-from flask import Flask, session, request, abort
+from flask import Flask, request, abort
 from flask_restful import Resource, Api
 from marshmallow import Schema, fields
 from marshmallow.validate import Range
@@ -63,8 +62,9 @@ class Predict(Resource):
         # featurize with one process using featurizer of first model
         featurized_mol = predictor['models'][0].featurizer.featurize([request.args['smiles']]).values
 
-        # make predictions
-        preds = [model.predict_proba_featurized(featurized_mol)[0] for model in predictor['models']]
+        # make predictions (predictor output can look different but we want preds as floats)
+        preds = [float(model.predict_proba_featurized(featurized_mol).squeeze()) for model in predictor['models']]
+
         return {'preds': preds}
 
 
@@ -78,4 +78,4 @@ available_predictors, available_predictor_references = init('predictors')
 pprint.pprint(available_predictor_references)
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=False, host='0.0.0.0')

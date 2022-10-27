@@ -172,7 +172,7 @@ class PTGGraphDataset(MolecularGraphDataset):
         file_name = dataset_spec.file_name
         base_name = file_name.with_suffix('').name
         
-        dataset_dirname = file_name.parent / 'graphdataset_pytorch'
+        dataset_dirname = file_name.parent / f'{base_name}_graphdataset_pytorch'
         dataset_fields_path = dataset_dirname / 'dataset_fields.pkl'
         pickled_graphs_dir = dataset_dirname / 'pickled_graphs'
         
@@ -290,12 +290,33 @@ class GraphDeepNeuralNetworkPredictor(DeepNeuralNetwork):
 
 
     def setup_dataloader(self, *, dataset: PTGGraphDataset, is_training: bool):
+        if is_training:
+            if self.config.weighted_sampler:
+                samples_weight = dataset.get_samples_weights()
+                sampler = WeightedRandomSampler(samples_weight, len(samples_weight))
+
+                dataloader = DataLoader(dataset,
+                                        batch_size=self.config.batch_size,
+                                        sampler=sampler,
+                                        drop_last=False,
+                                        num_workers=self.config.num_dl_workers,
+                                        pin_memory=True)
+                return dataloader
+
         dataloader = DataLoader(dataset,
-                              batch_size=self.config.batch_size,
-                              shuffle=is_training,
-                              pin_memory=True,
-                              num_workers=self.config.num_dl_workers)
+                                batch_size=self.config.batch_size,
+                                shuffle=False,
+                                drop_last=False,
+                                num_workers=self.config.num_dl_workers,
+                                pin_memory=True)
         return dataloader
+
+    #     dataloader = DataLoader(dataset,
+    #                           batch_size=self.config.batch_size,
+    #                           shuffle=is_training,
+    #                           pin_memory=True,
+    #                           num_workers=self.config.num_dl_workers)
+    #     return dataloader
 
     def loss_on_batch(self, batch):
         batch = batch.to(self.device)

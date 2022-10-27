@@ -75,13 +75,16 @@ class SMIDataset(MolecularDataset):
             except ValueError:
                 smiles_list = data[smiles_col]
                 remaining_columns = [(idx, name) for idx, name in remaining_columns if name != smiles_col]
-            try:
-                label_cols = int(label_cols)
-                remaining_columns = [(idx, name) for idx, name in remaining_columns if idx != label_cols]
-                labels = data.iloc[:, label_cols]
-            except ValueError:
-                labels = data[label_cols]
-                remaining_columns = [(idx, name) for idx, name in remaining_columns if name != label_cols]
+            if label_cols is not None:
+                try:
+                    label_cols = int(label_cols)
+                    remaining_columns = [(idx, name) for idx, name in remaining_columns if idx != label_cols]
+                    labels = data.iloc[:, label_cols]
+                except ValueError:
+                    labels = data[label_cols]
+                    remaining_columns = [(idx, name) for idx, name in remaining_columns if name != label_cols]
+            else:
+                labels = [float('nan')]*len(smiles_list)
 
             metadata = data.iloc[:, [idx for idx, name in remaining_columns]]
             if 0 in metadata.shape:

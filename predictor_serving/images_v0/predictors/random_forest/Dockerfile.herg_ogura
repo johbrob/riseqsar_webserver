@@ -17,7 +17,7 @@ COPY images_v0/cmd.sh .
 
 COPY images_v0/environments/base_environment/environment.yml .
 RUN mamba env create && \
-    mamba run -n base-predictor python -m pip install --no-deps rdkit && \
+    mamba run -n base-predictor python -m pip install --no-deps rdkit==2022.03.5 && \
     mamba run -n base-predictor python -m pip install --no-deps ./ChEMBL_Structure_Pipeline && \
     mamba run -n base-predictor python -m pip install --no-deps -e .
 #RUN rm -rf ./ChEMBL_Structure_Pipeline

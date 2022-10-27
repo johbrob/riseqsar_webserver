@@ -287,3 +287,28 @@ def find_experiment_top_level_models(path: Path):
 
     fixed_experiment_paths = sorted(path_prefixes.keys())
     return fixed_experiment_paths
+
+
+def find_top_level_resamples(path: Path):
+    "Finds all top level resamples in the given path"
+    
+    experiments_paths = set(path.glob('**/resample_*'))
+    path_prefixes = defaultdict(list)
+    
+    # This code looks for the shortest prefix, gradually constructing the whole path, 
+    # but aborting when it finds a match in experiment_paths. 
+    # This keeps nested resamples from showing up
+    for p in experiments_paths:
+        # accumulate will gradually build up the path until 
+        # the result matches a path in experiment paths. This means that paths 
+        # which are children to some path in experiment_path will be filtered out.
+        for prefix in itertools.accumulate(p.parts, lambda a, b: Path(a) / b):
+            if prefix in experiments_paths:
+                # If there is a match for the currenly built prefix in 
+                # experiment_paths, we break here. This stops nested 
+                # resamples from showing up
+                path_prefixes[prefix].append(p)
+                break
+
+    fixed_experiment_paths = sorted(path_prefixes.keys())
+    return fixed_experiment_paths

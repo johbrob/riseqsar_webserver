@@ -74,6 +74,7 @@ def run_experiment(*,
                                                         test_dataset=test_dataset,
                                                         experiment_config=fold_experiment_config)
             if proper_test_set is not None:
+                experiment_tracker.log_artifact('proper_test_dataset_spec', proper_test_set.dataset_spec)
                 test_predictions = model.predict_dataset_proba(proper_test_set)
                 test_performance = calculate_performance(true_class=proper_test_set.get_only_targets(),
                                                          prediction_scores=test_predictions.squeeze(),
