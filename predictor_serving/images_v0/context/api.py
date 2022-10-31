@@ -57,7 +57,12 @@ class Predict(Resource):
             abort(400, str(errors))
 
         # select predictor
+        pprint.pprint(available_predictors)
+        print(request.args['endpoint'], request.args['predictor_idx'])
+
         predictor = available_predictors[request.args['endpoint']][int(request.args['predictor_idx'])]
+
+        print(predictor)
 
         # featurize with one process using featurizer of first model
         featurized_mol = predictor['models'][0].featurizer.featurize([request.args['smiles']]).values
@@ -65,16 +70,19 @@ class Predict(Resource):
         # make predictions (predictor output can look different but we want preds as floats)
         preds = [float(model.predict_proba_featurized(featurized_mol).squeeze()) for model in predictor['models']]
 
+        print(preds)
+
         return {'preds': preds}
 
 
 api.add_resource(AvailablePredictors, '/available_predictors')
 api.add_resource(Predict, '/predict')
 
-print(os.getcwd())
-print(pathlib.Path('predictors').is_dir())
-print(pathlib.Path('images_v0/predictors').is_dir())
-available_predictors, available_predictor_references = init('predictors')
+# print(os.getcwd())
+# print(pathlib.Path('.').is_dir())
+# print(pathlib.Path('predictors').is_dir())
+# print(pathlib.Path('images_v0/predictors').is_dir())
+available_predictors, available_predictor_references = init('.')
 pprint.pprint(available_predictor_references)
 
 if __name__ == "__main__":

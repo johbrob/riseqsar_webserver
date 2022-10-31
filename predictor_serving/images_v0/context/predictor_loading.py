@@ -90,6 +90,5 @@ def get_available_predictors(dir_of_all_predictors):
 
 if __name__ == '__main__':
     # dir = Path('/home/johbro/PycharmProjects/rise-qsar/models')
-    dir = Path('predictors')
-    a = get_available_predictors(dir)
+    a = get_available_predictors(Path('.'))
     print(a)

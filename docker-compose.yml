@@ -2,18 +2,16 @@ version: '3.9'
 services:
   herg_ogura_random_forest:
     build:
-      #context: predictor_serving/images_v0/.
-      #dockerfile: Dockerfile.herg_ogura_shrink1
-      context: predictor_serving/.
-      dockerfile: images_v0/predictors/random_forest/Dockerfile.herg_ogura
+      context: predictor_serving/images_v0/.
+      dockerfile: Dockerfile.herg_ogura_rf
 
     ports:
     - "3002:5000"
 
   herg_ogura_feed_forward_network:
     build:
-      context: predictor_serving/.
-      dockerfile: images_v0/predictors/ffn/Dockerfile.herg_ogura
+      context: predictor_serving/images_v0/.
+      dockerfile: Dockerfile.herg_ogura_ffn
     ports:
     - "3003:5000"
 

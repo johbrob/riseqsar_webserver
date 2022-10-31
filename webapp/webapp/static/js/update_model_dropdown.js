@@ -6,8 +6,9 @@ function update_models(endpoint) {
     response.json().then(function(data) {
 
       let optionHTML = '';
-      for (let model of data.models) {
-        optionHTML += '<option value="' + model.idx + '">' + model.name + '</option>';
+      //for (let model of data.models) {
+      for (const [idx, model] of data.models.entries()) {
+        optionHTML += '<option value="' + idx + '">' + model.name + '</option>';
       };
 
        model_select.innerHTML = optionHTML;

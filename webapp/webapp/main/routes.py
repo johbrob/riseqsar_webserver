@@ -28,13 +28,11 @@ def predict(smiles=None, property_endpoint=None, predictor_idx=None):
     if request.method == 'POST':
         # update model choices
         endpoint_predictors = predictors[form.endpoint.data]
-        form.model.choices = [(p['idx'], p['idx']) for p in endpoint_predictors]
-
+        form.model.choices = [(i, i) for i in range(len(endpoint_predictors))]
         if form.errors:
             flash(form.errors)
 
         if form.validate_on_submit():
-            print(1, form.model.data)
             predictor = endpoint_predictors[int(form.model.data)]
 
             flash(f'{form.endpoint.data} property predicted for {form.smiles.data} using {predictor["name"]}',
@@ -43,21 +41,18 @@ def predict(smiles=None, property_endpoint=None, predictor_idx=None):
             return redirect(url_for('main.predict',
                                     smiles=form.smiles.data,
                                     property_endpoint=form.endpoint.data,
-                                    predictor_idx=int(form.model.data)))
+                                    predictor_idx=form.model.data))
 
     if smiles and property_endpoint and predictor_idx:
         predictor = predictors[property_endpoint][int(predictor_idx)]
         responce = requests.get(url=predictor['ip_address'] + '/predict',
                                 params={'smiles': smiles,
                                         'endpoint': property_endpoint,
-                                        'predictor_idx': int(predictor_idx)})
-        print(str(responce))
+                                        'predictor_idx': predictor['idx']})
         preds = responce.json()['preds']
         mol_img = smiles_2_b64_img(smiles)
         #draw_n_save_mol(smiles)
         pred_plot = create_plot(preds)
-
-        print(2, predictor_idx, form.model.data)
 
         return render_template('predict.html',
                                title='Predict',

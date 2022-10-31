@@ -3,7 +3,7 @@ import requests
 def merge_predictor_dicts(*pred_dicts_and_ips):
     """
 
-    :param pred_dicts_and_ips: arbitrary large set of predictor dicts and corresponding ips as
+    :param pred_dicts_and_ips: arbitrary large set of predictor dicts and corresponding ip adresses as
             (pred_dicts1, ip1), (pred_dicts2, ip2), ...
     :return:
     """
@@ -21,9 +21,9 @@ def merge_predictor_dicts(*pred_dicts_and_ips):
 
 
 def _check_for_predictor(address):
-    print(address + '/available_predictors')
+    # print(address + '/available_predictors')
     responce = requests.get(address + '/available_predictors')
-    print(responce)
+    # print(responce)
     return responce.json()
 
 def available_predictors():

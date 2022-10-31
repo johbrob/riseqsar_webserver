@@ -3,4 +3,5 @@ __pycache__/
 .DS_store
 .idea/
 /webapp/.env
-hherg_ogura/
+herg_ogura/
+/ChEMBL_Structure_Pipeline/

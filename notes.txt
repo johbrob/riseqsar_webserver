@@ -11,10 +11,11 @@ PriorityList:
         2. Try running NN-containers and check that it actually works                       check
         3. Specify package version for random_forest                                        check
         4. Specify packages for webserver                                                   check
-        5. Reduce size of containers
-        5. Make alternative webapp interface that take thresholds into account
-        6. Add prediction explanations
-        7. Add database volume for user data
+        5. Fix bug with model chosen/model used mismatch                                    check
+        6. Reduce size of containers
+        7. Make alternative webapp interface that take thresholds into account
+        8. Add prediction explanations
+        9. Add database volume for user data
 
 StepsToFinishTask:
     Task 1. - ffn-container crashes
@@ -25,7 +26,10 @@ StepsToFinishTask:
     5. Make rf work as it is supposed                                                       check
     6. Make ffn work as it is supposed                                                      check
 
-    Task 5. - reduce size of containers
+    Task 5  Fix bug with model chosen/model used mismatch
+    1. Make model referencing cleaner
+
+    Task 6. - reduce size of containers
     * copy one-line instead of multiple
     * make a .Dockerignore file
     * make distroless
