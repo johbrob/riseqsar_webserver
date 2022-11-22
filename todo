@@ -2,3 +2,15 @@ Fix trained model directory
 Add way for predictor containers to register to server (either write to file or register with some kind of authetication)
 Fix thunder_svm predictor container
 Make database a separate container
+
+Things that has to be done:
+1. Prediction as mean ensamble prediction
+2. Disable login requirement
+3. Return explanation
+
+Things that would be nice:
+1. Include persistant PostgreSQL database for users
+2. Accept prediction requests in batches
+3. Let model containers automatically register to server
+
+
