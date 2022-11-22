@@ -1,0 +1,25 @@
+#syntax=docker/dockerfile:1
+FROM condaforge/mambaforge:4.14.0-0 as conda
+
+EXPOSE 5000
+WORKDIR /app
+
+#RUN --mount=type=cache,target=/opt/conda/pkgs mamba create --copy -p /env --file conda-linux-64.lock
+
+COPY context/ environments/base_environment/conda-linux-64.lock predictors/random_forest/herg_ogura .
+
+RUN mamba create --copy -p /env --file conda-linux-64.lock && \
+    conda clean -afy && \
+    mamba run -p /env python -m pip install --no-deps rdkit==2022.03.5 && \
+    mamba run -p /env python -m pip install --no-deps ./ChEMBL_Structure_Pipeline && \
+    mamba run -p /env python -m pip install --no-deps -e . && \
+    rm setup.py
+
+RUN ls
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1   # prevent Python from making pyc files to disk
+ENV PYTHONUNBUFFERED 1          # prevents Python from buffering stdout and stderr
+
+CMD [ "/env/bin/gunicorn", "-b", "0.0.0.0:5000", "--worker-tmp-dir", "/dev/shm", "--workers", "2", \
+    "--threads", "4", "--worker-class", "gthread", "api:app"]

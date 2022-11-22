@@ -1,0 +1,31 @@
+name: riseqsar-webserver
+channels:
+  - plotly
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  - bcrypt=3.2.0
+  - flask-restful=0.3.9
+  - libffi=3.4.2
+  - numpy=1.22.0
+  - pandas=1.3.5
+  - pillow=8.4.0
+  - plotly=5.9.0
+  - python=3.9.9
+  - requests=2.28.1
+  - sqlalchemy=1.4.29
+  - sqlite=3.37.0
+  - werkzeug=2.1.2
+  - yaml=0.2.5
+  - email-validator==1.2.1
+  - flask==2.1.2
+  - flask-login==0.6.2
+  - gunicorn==20.1.0
+  - wtforms==3.0.1
+  - flask-mail==0.9.1
+  - flask-wtf==1.0.1
+  - flask-sqlalchemy==2.5.1
+  - pyjwt==2.5.0
+  - python-dotenv==0.21.0
+  - flask-bcrypt==1.0.1

@@ -1,0 +1,95 @@
+-------------------------------------------------------------------------------------------*/
+PriorityList:
+        1. Create predictor directories for NN models                                       check
+        2. Try running NN-containers and check that it actually works                       check
+        3. Specify package version for random_forest                                        check
+        4. Specify packages for webserver                                                   check
+        5. Fix bug with model chosen/model used mismatch                                    check
+        6. Reduce size of containers
+        7. Make alternative webapp interface that take thresholds into account              check
+        8. Add prediction explanations
+        9. Add database volume for user data
+       10. Support batch prediction jobs
+       11. Add switch to toggle on/off login requirements                                   check
+
+StepsToFinishTask:
+    Task 1. - ffn-container crashes
+    1. try adding package versions to everything except pytorch, rdkit, pip, gunicorn       check
+    2. try rebuild pytorch-image with correct version                                       check
+    3. add version to rdkit, pip, gunicorn and anything else installed in docker build file check
+    4. replace old riseqsar code with later version                                         check
+    5. Make rf work as it is supposed                                                       check
+    6. Make ffn work as it is supposed                                                      check
+
+    Task 6. - reduce size of containers
+    * copy one-line instead of multiple                                                     check
+    * make a .Dockerignore file                                                             check
+    * empty apt-get saved stuff                                                             check
+    * use lock files instead of environment                                                 check
+    * make distroless
+    * can we install fewer conda packages
+    * more stuff we can remove
+
+    Task 7. - include thresholds in predictions
+    * load thresholds files                                                                 check
+    * update api                                                                            check
+    * update webapp                                                                         check
+    * make sure everything works                                                            check
+    * adjust output
+
+    Task 11. Add support to toggle login requirements on/off
+    1. Temporary solution of just commenting out a line                                     check
+
+---------------------------------------------------------------------------------------*/
+Notes:
+-------------------------------- 2022-10-26 ----------------------------------------------*/
+Status: Believe docker containers work with torch and GPUs.
+        Nginx and gUnicorn are being used.
+        SQL-database with account info does not save state once webapp container is shut down.
+        GPU-containers haven't been tested yet.
+        Webapp show predictions on a scale even if they are not scaled equally.
+        Currently no explanations.
+        Model referencing doesn't give model name in url. If we will only have one of each model kind it could be nicer
+            to reference models by their name instead of their index in a model list
+-------------------------------- 2022-11-22 ----------------------------------------------*/
+Status: Docker containers do work with torch and GPUs.
+        The database issues are still present but are probably easy to fix. Just a question of knowing how.
+        Enabling batch jobs and having results sent by email requires database to work.
+        Currently no explanations but Erik have some that could probably be incorporated.
+        It would be nice if predictor containers register to the 'server' with their address but requires som modifications.
+        Have yet deployed the current version on ICE but have not been any problems with earlier versions.
+-------------------------------------------------------------------------------------------*/
+Installera en fungerande conda-miljö lokalt
+        ibland får jag python 3.10 även om jag specificerat att jag vill ha python 3.9
+        installationen av rdkit via conda/conda-forge blir fel. Funkar däremot om jag först installerar pip och sen installerar rdkit med pip
+        måste installera ChEMBLE_STRUCTURE_PIPELINE manuellt
+
+Köra predictor_loading via PyCharm
+        Håll ordning på din conda-miljö. Verkar inte vara exakt samma som den man kör i terminalen.
+
+
+Featurizer verkar ha ändrats någon gång
+        Nu temporär lösning där vi i calculate_mordred_descriptors har satt num_workers=1 men kanske borde göra något mer robust
+
+
+get base-predictor working with conda in docker
+get torch-predictor working with conda in docker
+get base-predictor working with distroless in docker
+get base-predictor working with gunicorn in docker
+
+
+---------------------------------------------
+
+Problem nu:
+        "conda run -n base-predictor gunicorn ..." fryser
+        "conda run -n base-predictor python ..." funkar
+
+
+
+----------------------------------------------
+Att fixa i riseqsar överlag:
+    just nu ger random forest-modeller ochh ffn-modeller prediktioner som ser olika ut.
+    rf ger np.array med shape (1) medan ffn ger (). Blir problem i container-api men går att lösa med .squeeze()
+
+TODO:
+        Fixa så att man anger path i api.py
