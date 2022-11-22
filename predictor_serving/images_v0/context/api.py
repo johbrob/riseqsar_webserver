@@ -66,14 +66,16 @@ class Predict(Resource):
         print(predictor)
 
         # featurize with one process using featurizer of first model
-        featurized_mol = predictor['models'][0].featurizer.featurize([request.args['smiles']]).values
+        featurized_mol = predictor['models'][0]['model'].featurizer.featurize([request.args['smiles']]).values
 
         # make predictions (predictor output can look different but we want preds as floats)
-        preds = [float(model.predict_proba_featurized(featurized_mol).squeeze()) for model in predictor['models']]
+        preds = [float(model['model'].predict_proba_featurized(featurized_mol).squeeze()) for model in predictor['models']]
+        thresholded_preds = [ 0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], preds)]
 
         print(preds)
+        print(thresholded_preds)
 
-        return {'preds': preds}
+        return {'preds': preds, 'thresholded_preds': thresholded_preds}
 
 
 api.add_resource(AvailablePredictors, '/available_predictors')
@@ -83,7 +85,7 @@ api.add_resource(Predict, '/predict')
 # print(pathlib.Path('.').is_dir())
 # print(pathlib.Path('predictors').is_dir())
 # print(pathlib.Path('images_v0/predictors').is_dir())
-available_predictors, available_predictor_references = init('.')
+available_predictors, available_predictor_references = init('../../..')
 pprint.pprint(available_predictor_references)
 
 if __name__ == "__main__":

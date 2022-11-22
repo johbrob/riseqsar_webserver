@@ -1,13 +1,4 @@
--------------------------------- 2022-10-26 ----------------------------------------------*/
-Status: Believe docker containers work with torch and GPUs.
-        Nginx and gUnicorn are being used.
-        SQL-database with account info does not save state once webapp container is shut down.
-        GPU-containers haven't been tested yet.
-        Webapp show predictions on a scale even if they are not scaled equally.
-        Currently no explanations.
-        Model referencing doesn't give model name in url. If we will only have one of each model kind it could be nicer
-            to reference models by their name instead of their index in a model list
-
+-------------------------------------------------------------------------------------------*/
 PriorityList:
         1. Create predictor directories for NN models                                       check
         2. Try running NN-containers and check that it actually works                       check
@@ -19,7 +10,7 @@ PriorityList:
         8. Add prediction explanations
         9. Add database volume for user data
        10. Support batch prediction jobs
-       11. Add switch to toggle on/off login requirements
+       11. Add switch to toggle on/off login requirements                                   check
 
 StepsToFinishTask:
     Task 1. - ffn-container crashes
@@ -39,17 +30,35 @@ StepsToFinishTask:
     * can we install fewer conda packages
     * more stuff we can remove
 
-    Task 7. include thresholds in predictions
-    1. load thresholds.csv                                                                  check
-    2. include it in api                                                                    check
-    3. include it in webapp                                                                 check
-    4. make sure everything works                                                           check
+    Task 7. - include thresholds in predictions
+    * load thresholds files                                                                 check
+    * update api                                                                            check
+    * update webapp                                                                         check
+    * make sure everything works                                                            check
+    * adjust output
 
     Task 11. Add support to toggle login requirements on/off
-    1. Add such a variable in webapp routes
-    2. Add such an argument in docker compose
+    1. Temporary solution of just commenting out a line                                     check
 
 ---------------------------------------------------------------------------------------*/
+Notes:
+-------------------------------- 2022-10-26 ----------------------------------------------*/
+Status: Believe docker containers work with torch and GPUs.
+        Nginx and gUnicorn are being used.
+        SQL-database with account info does not save state once webapp container is shut down.
+        GPU-containers haven't been tested yet.
+        Webapp show predictions on a scale even if they are not scaled equally.
+        Currently no explanations.
+        Model referencing doesn't give model name in url. If we will only have one of each model kind it could be nicer
+            to reference models by their name instead of their index in a model list
+-------------------------------- 2022-11-22 ----------------------------------------------*/
+Status: Docker containers do work with torch and GPUs.
+        The database issues are still present but are probably easy to fix. Just a question of knowing how.
+        Enabling batch jobs and having results sent by email requires database to work.
+        Currently no explanations but Erik have some that could probably be incorporated.
+        It would be nice if predictor containers register to the 'server' with their address but requires som modifications.
+        Have yet deployed the current version on ICE but have not been any problems with earlier versions.
+-------------------------------------------------------------------------------------------*/
 Installera en fungerande conda-miljö lokalt
         ibland får jag python 3.10 även om jag specificerat att jag vill ha python 3.9
         installationen av rdkit via conda/conda-forge blir fel. Funkar däremot om jag först installerar pip och sen installerar rdkit med pip

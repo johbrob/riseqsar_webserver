@@ -5,6 +5,7 @@ from flask_login import login_required
 from .utils import create_plot, smiles_2_b64_img, available_predictors
 from .forms import create_SmilesPredictForm
 import requests
+import statistics
 
 
 main = Blueprint('main', __name__)
@@ -50,6 +51,9 @@ def predict(smiles=None, property_endpoint=None, predictor_idx=None):
                                         'endpoint': property_endpoint,
                                         'predictor_idx': predictor['idx']})
         preds = responce.json()['preds']
+        thresholded_preds = responce.json()['thresholded_preds']
+        avg_thresholded_preds = statistics.mean(thresholded_preds)
+
         mol_img = smiles_2_b64_img(smiles)
         #draw_n_save_mol(smiles)
         pred_plot = create_plot(preds)
@@ -62,6 +66,7 @@ def predict(smiles=None, property_endpoint=None, predictor_idx=None):
                                prediction={'smiles': smiles,
                                            'endpoint': property_endpoint,
                                            'preds': preds,
+                                           'thresholded_preds': str(avg_thresholded_preds),
                                            'pred_plot': pred_plot,
                                            'predictor': predictor['name']})
     else:
