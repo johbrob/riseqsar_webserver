@@ -24,4 +24,3 @@ services:
     depends_on:
       - "herg_ogura_random_forest"
       - "herg_ogura_feed_forward_network"
-    env_file: webapp/.env.dev

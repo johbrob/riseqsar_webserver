@@ -1,0 +1,10 @@
+# Ignore everything
+
+# Allow files and directories
+
+# Ignore unnecessary files inside allowed directories
+# This should go after theh allowed directories
+**/.DS_Store,
+**/__pycache__
+**/-egg-info
+

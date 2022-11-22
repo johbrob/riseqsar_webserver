@@ -5,6 +5,8 @@ Status: Believe docker containers work with torch and GPUs.
         GPU-containers haven't been tested yet.
         Webapp show predictions on a scale even if they are not scaled equally.
         Currently no explanations.
+        Model referencing doesn't give model name in url. If we will only have one of each model kind it could be nicer
+            to reference models by their name instead of their index in a model list
 
 PriorityList:
         1. Create predictor directories for NN models                                       check
@@ -26,16 +28,13 @@ StepsToFinishTask:
     5. Make rf work as it is supposed                                                       check
     6. Make ffn work as it is supposed                                                      check
 
-    Task 5  Fix bug with model chosen/model used mismatch
-    1. Make model referencing cleaner
-
     Task 6. - reduce size of containers
-    * copy one-line instead of multiple
-    * make a .Dockerignore file
+    * copy one-line instead of multiple                                                     check
+    * make a .Dockerignore file                                                             check
+    * empty apt-get saved stuff                                                             check
+    * use lock files instead of environment                                                 check
     * make distroless
     * can we install fewer conda packages
-    * empty apt-get saved stuff
-    * use lock files instead of environment
     * more stuff we can remove
 
 

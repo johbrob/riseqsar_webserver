@@ -3,6 +3,10 @@ from pathlib import Path
 import sys
 from riseqsar.experiment.experiment_tracker import find_experiment_top_level_models
 
+predictorClass2NameMap = {'RandomForestPredictor': 'Random Forest',
+                          'DeepNeuralNetworkDescriptorbasedPredictor': 'Deep Neural Network',
+                          'GraphDeepNeuralNetwork': 'Graph Neural Network'}
+
 
 def _get_this_python_env():
     return Path(sys.prefix).name   # I am not sure if one shuld use sys.prefix or sys.base_prefix
@@ -54,7 +58,7 @@ def _get_predictor_info(models, path_to_predictor_dir, endpoint, available_predi
 
     predictor_class_as_string = str(type(models[0])).split("'")[1].split(".")[-1]
     # predictor_info['name'] = predictor_class_as_string + ' ' + predictor_info['path'].parent.name
-    predictor_info['name'] = predictor_class_as_string
+    predictor_info['name'] = predictorClass2NameMap[predictor_class_as_string]
 
     if endpoint in available_predictors:
         predictor_info['idx'] = len(available_predictors[endpoint])
