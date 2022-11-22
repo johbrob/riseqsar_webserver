@@ -1,0 +1,19 @@
+# Ignore everything
+*
+
+# Allow files and directories
+!context
+!environments
+!predictors
+!cmd
+
+# Ignore unnecessary files inside allowed directories
+# This should go after the allowed directories
+# eg 
+#**/*~, 
+#**/.DS_Store, 
+#**/Thumbs.db, 
+#**/*.log
+context/local_debugging.py
+
+

@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM pytorch_py3.9
+FROM pytorch1.11_py3.9
 
 EXPOSE 5000
 WORKDIR /app
@@ -11,13 +11,13 @@ WORKDIR /app
 COPY ChEMBL_Structure_Pipeline ChEMBL_Structure_Pipeline
 COPY images_v0/api.py images_v0/predictor_loading.py images_v0/setup.py ./
 COPY images_v0/riseqsar riseqsar
-COPY images_v0/predictors/random_forest/herg_ogura	predictors
+COPY images_v0/predictors/ffn/herg_ogura	predictors
 COPY images_v0/predictors/ffn/cmd.sh .
 
 COPY images_v0/environments/torch_environment/environment.yml .
 #RUN conda env create
 RUN conda env update --name base --file environment.yml --prune
-RUN conda run -n base python -m pip install --no-deps rdkit && \
+RUN conda run -n base python -m pip install --no-deps rdkit==2022.03.5 && \
     conda run -n base python -m pip install --no-deps ./ChEMBL_Structure_Pipeline && \
     #conda run -n base conda install -y pytorch && \ 
     conda run -n base python -m pip install --no-deps -e .

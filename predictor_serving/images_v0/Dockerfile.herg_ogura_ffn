@@ -1,0 +1,26 @@
+# syntax=docker/dockerfile:1
+FROM pytorch1.11_py3.9
+
+EXPOSE 5000
+WORKDIR /app
+
+#COPY images_v0/environments/conda-linux-64.lock .
+#RUN mamba create --copy -p /env --file conda-linux-64.lock && conda clean -afy
+#RUN --mount=type=cache,target=/opt/conda/pkgs mamba create --copy -p /env --file conda-linux-64.lock
+
+COPY context/ environments/torch_environment/environment.yml predictors/ffn/herg_ogura cmd/torch_cmd.sh .
+
+
+RUN conda env update --name base --file environment.yml --prune && \
+    conda run -n base python -m pip install --no-deps rdkit==2022.03.5 && \
+    conda run -n base python -m pip install --no-deps ./ChEMBL_Structure_Pipeline && \
+    conda run -n base python -m pip install --no-deps -e . #&& \
+    #rm setup.py && \
+    #rm environment.yml
+
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1   # prevent Python from making pyc files to disk
+ENV PYTHONUNBUFFERED 1          # prevents Python from buffering stdout and stderr
+
+CMD ["sh", "torch_cmd.sh"]
