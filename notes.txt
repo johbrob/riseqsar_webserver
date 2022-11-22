@@ -37,6 +37,12 @@ StepsToFinishTask:
     * can we install fewer conda packages
     * more stuff we can remove
 
+    Task 7. - include thresholds in predictions
+    * load thresholds files                                                                 check
+    * update api                                                                            check
+    * update webapp                                                                         check
+    * make sure everything works
+    * adjust output
 
 -----------------------------------------------------------------------------------------*/
 Installera en fungerande conda-miljö lokalt
