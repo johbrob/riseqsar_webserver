@@ -15,9 +15,11 @@ PriorityList:
         4. Specify packages for webserver                                                   check
         5. Fix bug with model chosen/model used mismatch                                    check
         6. Reduce size of containers
-        7. Make alternative webapp interface that take thresholds into account
+        7. Make alternative webapp interface that take thresholds into account              check
         8. Add prediction explanations
         9. Add database volume for user data
+       10. Support batch prediction jobs
+       11. Add switch to toggle on/off login requirements
 
 StepsToFinishTask:
     Task 1. - ffn-container crashes
@@ -37,8 +39,17 @@ StepsToFinishTask:
     * can we install fewer conda packages
     * more stuff we can remove
 
+    Task 7. include thresholds in predictions
+    1. load thresholds.csv                                                                  check
+    2. include it in api                                                                    check
+    3. include it in webapp                                                                 check
+    4. make sure everything works                                                           check
 
------------------------------------------------------------------------------------------*/
+    Task 11. Add support to toggle login requirements on/off
+    1. Add such a variable in webapp routes
+    2. Add such an argument in docker compose
+
+---------------------------------------------------------------------------------------*/
 Installera en fungerande conda-miljö lokalt
         ibland får jag python 3.10 även om jag specificerat att jag vill ha python 3.9
         installationen av rdkit via conda/conda-forge blir fel. Funkar däremot om jag först installerar pip och sen installerar rdkit med pip
