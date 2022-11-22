@@ -29,3 +29,13 @@ services:
       - webapp
     ports:
       - "80:80"
+
+  postgres:
+    images: postgres:latest
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - "15432:5432"
+
