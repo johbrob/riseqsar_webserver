@@ -5,3 +5,4 @@ __pycache__/
 /webapp/context/.env
 herg_ogura/
 /ChEMBL_Structure_Pipeline/
+predictor_serving/images_v0/context/predictors

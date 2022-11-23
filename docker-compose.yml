@@ -4,7 +4,6 @@ services:
     build:
       context: predictor_serving/images_v0/.
       dockerfile: Dockerfile.herg_ogura_rf
-
     ports:
     - "3002:5000"
 
@@ -15,6 +14,27 @@ services:
     ports:
     - "3003:5000"
 
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+
+  pgadmin-compose:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "johan.broberg92@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "test123!"
+    ports:
+      - "16543:80"
+    depends_on:
+      - db
+
   webapp:
     build:
       context: webapp/
@@ -24,6 +44,7 @@ services:
     depends_on:
       - "herg_ogura_random_forest"
       - "herg_ogura_feed_forward_network"
+      - "db"
 
   nginx:
     image: nginx:latest
@@ -34,11 +55,6 @@ services:
     ports:
       - "80:80"
 
-  postgres:
-    images: postgres:latest
-    volumes:
-      - postgresdata:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: example
-    ports:
-      - "15432:5432"
+volumes:
+  db:
+    driver: local

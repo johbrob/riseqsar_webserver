@@ -5,15 +5,16 @@ PriorityList:
         3. Specify package version for random_forest                                        check
         4. Specify packages for webserver                                                   check
         5. Fix bug with model chosen/model used mismatch                                    check
-        6. Reduce size of containers
-        7. Make alternative webapp interface that take thresholds into account              check
+        6. Make alternative webapp interface that take thresholds into account              check
+        7. Reduce size of containers
         8. Add prediction explanations
         9. Add database volume for user data
        10. Support batch prediction jobs
        11. Add switch to toggle on/off login requirements                                   check
+       12. Make everything as ready as possible for deployment
 
 StepsToFinishTask:
-    Task 1. - ffn-container crashes
+    Task 1. - ffn-container crashes                                                         DONE
     1. try adding package versions to everything except pytorch, rdkit, pip, gunicorn       check
     2. try rebuild pytorch-image with correct version                                       check
     3. add version to rdkit, pip, gunicorn and anything else installed in docker build file check
@@ -21,7 +22,13 @@ StepsToFinishTask:
     5. Make rf work as it is supposed                                                       check
     6. Make ffn work as it is supposed                                                      check
 
-    Task 6. - reduce size of containers
+    Task 6. - include thresholds in predictions                                             DONE
+    * load thresholds files                                                                 check
+    * update api                                                                            check
+    * update webapp                                                                         check
+    * make sure everything works                                                            check
+
+    Task 7. - reduce size of containers
     * copy one-line instead of multiple                                                     check
     * make a .Dockerignore file                                                             check
     * empty apt-get saved stuff                                                             check
@@ -30,15 +37,21 @@ StepsToFinishTask:
     * can we install fewer conda packages
     * more stuff we can remove
 
-    Task 7. - include thresholds in predictions
-    * load thresholds files                                                                 check
-    * update api                                                                            check
-    * update webapp                                                                         check
-    * make sure everything works                                                            check
-    * adjust output
+    Task 11. Add support to toggle login requirements on/off                                DONE
+    * Temporary solution of just commenting out a line                                      check
 
-    Task 11. Add support to toggle login requirements on/off
-    1. Temporary solution of just commenting out a line                                     check
+    Task 9. Add postgre database volume and container for user data
+    * install psycop2 into webapp container
+    * understand what psycop2 is doing
+    * make sure datbase uri is correct (should port be included for instance?)
+    * check how to initialize the database
+    * how do we verify that the database is initialized
+
+    Task 12. Make everything as ready as possible for deployment
+    * remove sidebar
+    * remove other plots for now
+    * make sure it runs on ICE and build torch-images if necessary
+    * prepare as many of the model types as possible
 
 ---------------------------------------------------------------------------------------*/
 Notes:
