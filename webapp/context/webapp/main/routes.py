@@ -17,7 +17,7 @@ predictors = available_predictors()
 
 @main.route("/", methods=['GET', 'POST'])
 @main.route("/home/", methods=['GET', 'POST'])
-@login_required
+# @login_required
 def home():
     return redirect(url_for('main.predict'))
 
@@ -56,18 +56,18 @@ def predict(smiles=None, property_endpoint=None, predictor_idx=None):
 
         mol_img = smiles_2_b64_img(smiles)
         #draw_n_save_mol(smiles)
-        pred_plot = create_plot(preds)
+        # pred_plot = create_plot(preds)
 
         return render_template('predict.html',
                                title='Predict',
                                form=form,
-                               plot=pred_plot,
+                               # plot=pred_plot,
                                mol_img=mol_img,
                                prediction={'smiles': smiles,
                                            'endpoint': property_endpoint,
                                            'preds': preds,
                                            'thresholded_preds': str(avg_thresholded_preds),
-                                           'pred_plot': pred_plot,
+                                           # 'pred_plot': pred_plot,
                                            'predictor': predictor['name']})
     else:
         return render_template('predict.html', form=form)

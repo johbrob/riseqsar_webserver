@@ -48,7 +48,7 @@ StepsToFinishTask:
     * how do we verify that the database is initialized
 
     Task 12. Make everything as ready as possible for deployment
-    * remove sidebar
+    * remove sidebar                                                                        check
     * remove other plots for now
     * make sure it runs on ICE and build torch-images if necessary
     * prepare as many of the model types as possible

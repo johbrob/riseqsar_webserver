@@ -72,18 +72,18 @@
           <br>
           {{ 'Prediction: ' + prediction.thresholded_preds }}
         </div>
-        <div class="row">
-          <div>
-            <div class="chart" id="graph" style="width:100%">
-                <script>
-                    var data = {{ plot | safe }};
-                    var layout = {autosize: true};
-                    var config = {responsive: true};
-                    Plotly.plot( 'graph', data, layout, config);
-                </script>
-            </div>
-          </div>
-        </div>
+<!--        <div class="row">-->
+<!--          <div>-->
+<!--            <div class="chart" id="graph" style="width:100%">-->
+<!--                <script>-->
+<!--                    var data = {{ plot | safe }};-->
+<!--                    var layout = {autosize: true};-->
+<!--                    var config = {responsive: true};-->
+<!--                    Plotly.plot( 'graph', data, layout, config);-->
+<!--                </script>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
       </div>
     {% endif %}
 
