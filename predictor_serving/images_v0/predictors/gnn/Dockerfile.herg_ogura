@@ -1,0 +1,33 @@
+# syntax=docker/dockerfile:1
+FROM pytorch1.11_py3.9
+
+EXPOSE 5000
+WORKDIR /app
+
+#COPY images_v0/environments/conda-linux-64.lock .
+#RUN conda create --copy -p /env --file conda-linux-64.lock && conda clean -afy
+#RUN --mount=type=cache,target=/opt/conda/pkgs mamba create --copy -p /env --file conda-linux-64.lock
+
+COPY ChEMBL_Structure_Pipeline ChEMBL_Structure_Pipeline
+COPY images_v0/api.py images_v0/predictor_loading.py images_v0/setup.py ./
+COPY images_v0/riseqsar riseqsar
+COPY images_v0/predictors/gnn/herg_ogura	predictors
+COPY images_v0/predictors/gnn/cmd.sh .
+
+COPY images_v0/environments/pyg_environment/environment.yml .
+#RUN conda env create
+RUN conda env update --name base --file environment.yml --prune
+RUN conda run -n base python -m pip install --no-deps rdkit==2022.03.5 && \
+    conda run -n base python -m pip install --no-deps ./ChEMBL_Structure_Pipeline && \
+    #conda run -n base conda install -y pytorch && \ 
+    conda run -n base python -m pip install --no-deps -e .
+#RUN rm -rf ./ChEMBL_Structure_Pipeline
+#=1.12.1=cuda102py39h5d53aaf_201 && \
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1 	# prevent Python from making pyc files to disk
+ENV PYTHONUNBUFFERED 1		# prevents Python from buffering stdout and stderr
+
+#CMD ["mamba", "run", "-n", "base-predictor", "python3", "api.py"]
+#CMD ["mamba", "run", "-n", "base-predictor", "gunicorn", "-w", "4", "-b", "localhost:5000", "api:app"]
+CMD ["sh", "cmd.sh"]
