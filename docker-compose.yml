@@ -15,6 +15,14 @@ services:
     ports:
     - "3003:5000"
 
+  herg_ogura_gnn:
+    build:
+      context: predictor_serving/images_v0/.
+      dockerfile: Dockerfile.herg_ogura_gnn
+
+    ports:
+      - "3004:5000"
+
   webapp:
     build:
       context: webapp/
