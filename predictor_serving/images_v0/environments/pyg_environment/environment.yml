@@ -2,6 +2,7 @@ name: base-predictor
 channels:
   - conda-forge
   - defaults
+  - pyg
 dependencies:
     # - cudnn=8.4.1.50=hed8a83a_0
     # - magma=2.5.4=h6103c52_2
