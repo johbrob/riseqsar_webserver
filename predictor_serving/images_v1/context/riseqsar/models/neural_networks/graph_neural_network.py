@@ -156,6 +156,7 @@ def make_data_graph(graph: MolecularGraph, y=None, atom_features=None, bond_feat
     x = torch.tensor(x, dtype=torch.long)
     edge_index = torch.tensor(edge_index, dtype=torch.long)
     edge_attr = torch.tensor(edge_attr, dtype=torch.long)
+    print(x, edge_index, edge_attr)
     if y is not None:
         y = torch.tensor(y, dtype=torch.float32)
     ptg_data = Data(x=x, edge_index=edge_index, edge_attr=edge_attr, y=y, graph=graph)
@@ -354,6 +355,7 @@ class GraphDeepNeuralNetworkPredictor(DeepNeuralNetwork):
         self.model.eval()
         with torch.no_grad():
             mol_graph = MolecularGraph.from_smiles(smiles)
+            print(mol_graph)
             print(smiles)
             ptgraph = make_data_graph(mol_graph)
             ptgraph.to(self.device)
