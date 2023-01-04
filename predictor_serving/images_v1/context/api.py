@@ -73,10 +73,9 @@ class Predict(Resource):
             preds = [float(model['model'].predict_proba_featurized(featurized_mol).squeeze()) for model in
                      predictor['models']]
         else:
-            print(predictor['models'][0]['model'].predict_proba(request.args['smiles']))
-            [print(model['model'].predict_proba(request.args['smiles']).squeeze()) for model in
-             predictor['models']]
-            preds = [float(model['model'].predict_proba(request.args['smiles']).squeeze()) for model in
+            # output of gnns are sigmoid. Should probably be softmax since this is binary classification.
+            # ignore for now, models are already trained.
+            preds = [float(model['model'].predict_proba(request.args['smiles']).squeeze()[1]) for model in
                      predictor['models']]
 
         thresholded_preds = [0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], preds)]
