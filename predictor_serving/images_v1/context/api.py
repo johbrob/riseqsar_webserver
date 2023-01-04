@@ -80,22 +80,19 @@ class Predict(Resource):
             preds_0 = [float(model['model'].predict_proba(request.args['smiles']).squeeze()[1]) for model in
                      predictor['models']]
 
-            import torch
-            thrshld_preds_1 = [0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], preds)]
-            thrshld_preds_0 = [0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], preds_0)]
-            thrshld_logit_1 = [0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], torch.logit(preds))]
-            thrshld_logit_0 = [0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], torch.logit(preds_0))]
-
-            print('threshold preds 0', thrshld_preds_0)
-            print('threshold preds 1', thrshld_preds_1)
-            print('threshold logits 0', thrshld_logit_0)
-            print('threshold logits 1', thrshld_logit_1)
+            e_smiles = [model['model'].explain_smiles(request.args['smiles']).squeeze() for model in
+                     predictor['models']]
 
 
         thresholded_preds = [0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], preds)]
 
         print(preds)
         print(thresholded_preds)
+
+        thresholded_preds_0 = [0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], preds)]
+        print('thresholded_preds_0', thresholded_preds_0)
+
+        print('smiles_explanations', e_smiles)
 
         return {'preds': preds, 'thresholded_preds': thresholded_preds}
 
