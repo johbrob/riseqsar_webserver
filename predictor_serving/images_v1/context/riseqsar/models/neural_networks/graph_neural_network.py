@@ -359,7 +359,7 @@ class GraphDeepNeuralNetworkPredictor(DeepNeuralNetwork):
             ptgraph.to(self.device)
             pred_logistic = self.model(ptgraph)
             pred_prob = torch.sigmoid(pred_logistic)
-            print(pred_prob)
+            print(pred_logistic, pred_prob)
             return pred_prob.detach().cpu().numpy()
 
     def predict_dataset_proba(self, dataset: PTGGraphDataset):
