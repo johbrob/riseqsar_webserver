@@ -138,13 +138,10 @@ class GNNEncoder(torch.nn.Module):
         for layer in self.gnn_layers:
             x = layer(x, data.edge_index, data.edge_attr)
         x = self.dense_layer(x)
-        print('data.batch', data.batch)
-        print('x', x)
         if data.batch is not None:
             x = global_mean_pool(x, data.batch)
         else:
             x = global_mean_pool(x, torch.ones(1, dtype=torch.int64).to(x.get_device()))
-        print('x', x)
         x = self.relu(x)
         x = self.dropout(x)
         x = self.output_layer(x)
