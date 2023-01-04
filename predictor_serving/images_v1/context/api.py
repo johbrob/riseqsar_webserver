@@ -73,6 +73,7 @@ class Predict(Resource):
             preds = [float(model['model'].predict_proba_featurized(featurized_mol).squeeze()) for model in
                      predictor['models']]
         else:
+            print(predictor['models'][0]['model'].predict_proba(request.args['smiles']))
             preds = [float(model['model'].predict_proba(request.args['smiles']).squeeze()) for model in
                      predictor['models']]
 
