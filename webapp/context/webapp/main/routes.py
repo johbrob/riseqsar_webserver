@@ -57,6 +57,8 @@ def predict(smiles=None, property_endpoint=None, predictor_idx=None):
         mol_img = smiles_2_b64_img(smiles)
         #draw_n_save_mol(smiles)
         # pred_plot = create_plot(preds)
+        print('preds', preds)
+        print('thresholded_preds', thresholded_preds)
 
         return render_template('predict.html',
                                title='Predict',
