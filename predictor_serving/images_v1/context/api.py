@@ -74,8 +74,23 @@ class Predict(Resource):
                      predictor['models']]
         else:
             # I am not sure about outputs from GNNs. Logits are passed through sigmoid and value at index 1 semm to always be 0.0
-            preds = [float(model['model'].predict_proba(request.args['smiles']).squeeze()[0]) for model in
+            preds = [float(model['model'].predict_proba(request.args['smiles']).squeeze()[1]) for model in
                      predictor['models']]
+
+            preds_0 = [float(model['model'].predict_proba(request.args['smiles']).squeeze()[1]) for model in
+                     predictor['models']]
+
+            import torch
+            thrshld_preds_1 = [0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], preds)]
+            thrshld_preds_0 = [0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], preds_0)]
+            thrshld_logit_1 = [0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], torch.logit(preds))]
+            thrshld_logit_0 = [0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], torch.logit(preds_0))]
+
+            print('threshold preds 0', thrshld_preds_0)
+            print('threshold preds 1', thrshld_preds_1)
+            print('threshold logits 0', thrshld_logit_0)
+            print('threshold logits 1', thrshld_logit_1)
+
 
         thresholded_preds = [0 if pred < model['threshold'] else 1 for model, pred in zip(predictor['models'], preds)]
 
