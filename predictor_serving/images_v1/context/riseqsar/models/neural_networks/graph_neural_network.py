@@ -354,10 +354,12 @@ class GraphDeepNeuralNetworkPredictor(DeepNeuralNetwork):
         self.model.eval()
         with torch.no_grad():
             mol_graph = MolecularGraph.from_smiles(smiles)
+            print(smiles)
             ptgraph = make_data_graph(mol_graph)
             ptgraph.to(self.device)
             pred_logistic = self.model(ptgraph)
             pred_prob = torch.sigmoid(pred_logistic)
+            print(pred_prob)
             return pred_prob.detach().cpu().numpy()
 
     def predict_dataset_proba(self, dataset: PTGGraphDataset):
