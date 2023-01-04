@@ -1,0 +1,14 @@
+# Ignore everything
+*
+
+# Allow files and directories
+!ChEMBL_Structure_Pipeline
+!conda-linux-64.lock
+
+# Ignore unnecessary files inside allowed directories
+# This should go after the allowed directories
+# eg 
+#**/*~, 
+#**/.DS_Store, 
+#**/Thumbs.db, 
+#**/*.log

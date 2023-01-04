@@ -1,23 +1,24 @@
 version: '3.9'
 services:
-  herg_ogura_random_forest:
+  herg_ogura_rf:
     build:
-      context: predictor_serving/images_v0/.
+      context: predictor_serving/images_v1/.
       dockerfile: Dockerfile.herg_ogura_rf
 
     ports:
-    - "3002:5000"
+      - "3002:5000"
 
-  herg_ogura_feed_forward_network:
+  herg_ogura_ffn:
     build:
-      context: predictor_serving/images_v0/.
+      context: predictor_serving/images_v1/.
       dockerfile: Dockerfile.herg_ogura_ffn
+    
     ports:
-    - "3003:5000"
+      - "3003:5000"
 
   herg_ogura_gnn:
     build:
-      context: predictor_serving/images_v0/.
+      context: predictor_serving/images_v1/.
       dockerfile: Dockerfile.herg_ogura_gnn
 
     ports:
@@ -28,10 +29,11 @@ services:
       context: webapp/
       dockerfile: Dockerfile
     ports:
-    - "5000:5000"
+      - "5000:5000"
     depends_on:
-      - "herg_ogura_random_forest"
-      - "herg_ogura_feed_forward_network"
+      - "herg_ogura_rf"
+      - "herg_ogura_ffn"
+      - "herg_ogura_gnn"
 
   nginx:
     image: nginx:latest

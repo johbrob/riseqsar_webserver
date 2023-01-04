@@ -27,7 +27,12 @@ def _check_for_predictor(address):
     return responce.json()
 
 def available_predictors():
-    available_ports = ['http://tmp_docker_test-herg_ogura_feed_forward_network-1:5000', 'http://tmp_docker_test-herg_ogura_random_forest-1:5000']
+    # available_ports = ['http://tmp_docker_test-herg_ogura_feed_forward_network-1:5000', 'http://tmp_docker_test-herg_ogura_random_forest-1:5000']
+    available_ports = [
+            'http://riseqsar_webserver-herg_ogura_ffn-1:5000', 
+            'http://riseqsar_webserver-herg_ogura_rf-1:5000',
+            'http://riseqsar_webserver-herg_ogura_gnn-1:5000',
+                       ]
 
     all_predictors = [(_check_for_predictor(port), port) for port in available_ports]
     [print(str(predictor[0]), predictor[1]) for predictor in all_predictors]

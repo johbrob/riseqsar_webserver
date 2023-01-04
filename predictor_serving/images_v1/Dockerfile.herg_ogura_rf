@@ -1,0 +1,15 @@
+#syntax=docker/dockerfile:1
+FROM nvidia_cuda113_conda
+
+EXPOSE 5000
+WORKDIR /app
+
+COPY predictors/random_forest/herg_ogura cmd/cmd.sh context .
+
+RUN conda run -p /env python -m pip install --no-deps -e .
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1   # prevent Python from making pyc files to disk
+ENV PYTHONUNBUFFERED 1          # prevents Python from buffering stdout and stderr
+
+CMD ["sh", "cmd.sh"] 
